@@ -14,7 +14,7 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import backref, relationship
 
-from app.constants import DrawStatus, GameStatus, GiftStatus
+from app.constants import DrawStatus, GameStatus, GiftStatus, JoinRequestStatus
 from app.db.database import Base
 
 
@@ -77,12 +77,13 @@ class Game(Base):
     title = Column(String(200), nullable=False)
     description = Column(Text)
     budget = Column(Float)
-    event_date = Column(Date)
+    event_date = Column(DateTime)
     status = Column(String(20), default=GameStatus.DRAFT)
-    secret_key = Column(String(64), unique=True, nullable=False)
+    secret_key = Column(String(10), unique=True, nullable=False)
     organizer_id = Column(
-        Integer, ForeignKey("users.id", ondelete="SET NULL"), nullable=True
+        Integer, ForeignKey("users.id", ondelete="SET NULL"), nullable=False
     )
+    is_private = Column(Boolean, default=False)
     is_deleted = Column(Boolean, default=False)
     created_at = Column(DateTime, default=now)
     updated_at = Column(DateTime, onupdate=now)
@@ -99,6 +100,19 @@ class Game(Base):
     )
     draws = relationship("Draw", back_populates="game", cascade="all, delete-orphan")
     gifts = relationship("Gift", back_populates="game", cascade="all, delete-orphan")
+
+
+class JoinRequest(Base):
+    __tablename__ = "join_requests"
+
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    game_id = Column(Integer, ForeignKey("games.id"), nullable=False)
+    created_at = Column(DateTime, default=now)
+    status = Column(String(20), default=JoinRequestStatus.PENDING)
+
+    user = relationship("User")
+    game = relationship("Game")
 
 
 class Participant(Base):

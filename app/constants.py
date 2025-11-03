@@ -15,3 +15,9 @@ class DrawStatus:
     PENDING = "pending"
     COMPLETED = "completed"
     ERROR = "error"
+
+
+class JoinRequestStatus:
+    PENDING = "pending"
+    APPROVED = "approved"
+    REJECTED = "rejected"
