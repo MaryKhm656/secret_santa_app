@@ -3,7 +3,6 @@ from datetime import datetime, timezone
 from sqlalchemy import (
     Boolean,
     Column,
-    Date,
     DateTime,
     Float,
     ForeignKey,
@@ -154,7 +153,7 @@ class Participant(Base):
     )
 
     gifts = relationship(
-        "Gift", back_populates="participant", cascade="all, delete-orphan"
+        "Gift", back_populates="participant", foreign_keys="[Gift.participant_id]", cascade="all, delete-orphan"
     )
 
 

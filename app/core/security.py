@@ -3,7 +3,7 @@ from string import ascii_lowercase, ascii_uppercase, digits
 
 from passlib.context import CryptContext
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+pwd_context = CryptContext(schemes=["pbkdf2_sha256"], deprecated="auto", pbkdf2_sha256__default_rounds=300000)
 
 
 def hash_password(password: str) -> str:

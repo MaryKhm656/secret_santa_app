@@ -1,4 +1,4 @@
-from app.db.database import init_db
+from app.db.database import drop_all
 from app.db.models import (
     User,
     Game,
@@ -12,5 +12,6 @@ from app.db.models import (
     Notification
 )
 
+
 if __name__ == "__main__":
-    init_db()
+    drop_all()
