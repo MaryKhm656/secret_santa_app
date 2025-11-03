@@ -1,13 +1,9 @@
-from environs import Env
 from sqlalchemy import create_engine
 from sqlalchemy.orm import declarative_base, sessionmaker
 
-env = Env()
-env.read_env()
+from app.core.config import DATABASE_URL
 
-db_url = env("DATABASE_URL")
-
-engine = create_engine(db_url)
+engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(bind=engine)
 Base = declarative_base()
 
