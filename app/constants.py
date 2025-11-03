@@ -1,10 +1,3 @@
-class UserRole:
-    USER = "user"
-    PLAYER = "player"
-    ORGANIZER = "organizer"
-    ADMIN = "admin"
-
-
 class GameStatus:
     DRAFT = "draft"
     ACTIVE = "active"

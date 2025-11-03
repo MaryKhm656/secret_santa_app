@@ -14,7 +14,7 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import backref, relationship
 
-from app.constants import DrawStatus, GameStatus, GiftStatus, UserRole
+from app.constants import DrawStatus, GameStatus, GiftStatus
 from app.db.database import Base
 
 
@@ -35,7 +35,6 @@ class User(Base):
     username = Column(String(100))
     email = Column(String(100), unique=True, nullable=False)
     password_hash = Column(String(300), nullable=False)
-    role = Column(String(20), default=UserRole.USER)
     wishlist = Column(Text)
     is_active = Column(Boolean, default=True)
     created_at = Column(DateTime, default=now)
@@ -47,7 +46,7 @@ class User(Base):
         cascade="all, delete-orphan",
         passive_deletes=True,
     )
-    participations = relationship(
+    participation = relationship(
         "Participant",
         back_populates="user",
         cascade="all, delete-orphan",
@@ -131,7 +130,7 @@ class Participant(Base):
     joined_at = Column(DateTime, default=now)
     left_at = Column(DateTime, nullable=True)
 
-    user = relationship("User", back_populates="participations", foreign_keys=[user_id])
+    user = relationship("User", back_populates="participation", foreign_keys=[user_id])
     game = relationship("Game", back_populates="participants")
 
     assigned_to = relationship(

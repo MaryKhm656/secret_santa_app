@@ -11,7 +11,6 @@ class UserService:
             email: str,
             password: str,
             username: str = None,
-            wishlist: str = None,
     ) -> User:
         """Method for create new user in DB"""
         if username and len(username.strip()) < 2:
@@ -28,8 +27,7 @@ class UserService:
         user = User(
             username=username,
             email=email,
-            password_hash=hashed_password,
-            wishlist=wishlist
+            password_hash=hashed_password
         )
         db.add(user)
         db.commit()
