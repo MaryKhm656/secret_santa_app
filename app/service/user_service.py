@@ -7,10 +7,10 @@ from app.db.models import User
 class UserService:
     @staticmethod
     def create_user(
-            db: Session,
-            email: str,
-            password: str,
-            username: str = None,
+        db: Session,
+        email: str,
+        password: str,
+        username: str = None,
     ) -> User:
         """Method for create new user in DB"""
         if username and len(username.strip()) < 2:
@@ -24,11 +24,7 @@ class UserService:
             raise ValueError("Пользователь с таким email уже существует")
 
         hashed_password = hash_password(password)
-        user = User(
-            username=username,
-            email=email,
-            password_hash=hashed_password
-        )
+        user = User(username=username, email=email, password_hash=hashed_password)
         db.add(user)
         db.commit()
         db.refresh(user)

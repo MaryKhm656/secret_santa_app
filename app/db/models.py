@@ -110,9 +110,10 @@ class JoinRequest(Base):
     game_id = Column(Integer, ForeignKey("games.id"), nullable=False)
     created_at = Column(DateTime, default=now)
     status = Column(String(20), default=JoinRequestStatus.PENDING)
+    organizer_id = Column(Integer, ForeignKey("users.id"), nullable=False)
 
-    user = relationship("User")
-    game = relationship("Game")
+    user = relationship("User", foreign_keys=[user_id])
+    game = relationship("Game", foreign_keys=[game_id])
 
 
 class Participant(Base):
@@ -135,14 +136,12 @@ class Participant(Base):
         Integer, ForeignKey("games.id", ondelete="CASCADE"), nullable=False
     )
 
-    assigned_to_id = Column(
-        Integer, ForeignKey("participants.id", ondelete="SET NULL"), nullable=True
-    )
+    assigned_to_id = Column(Integer, ForeignKey("participants.id", ondelete="SET NULL"))
 
     wishlist = Column(Text)
     gift_status = Column(String(20), default=GiftStatus.NOT_SENT)
     joined_at = Column(DateTime, default=now)
-    left_at = Column(DateTime, nullable=True)
+    left_at = Column(DateTime)
 
     user = relationship("User", back_populates="participation", foreign_keys=[user_id])
     game = relationship("Game", back_populates="participants")

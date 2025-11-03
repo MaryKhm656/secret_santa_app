@@ -4,7 +4,7 @@ from fastapi import Depends, HTTPException, Request
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 
-from app.core.config import SECRET_KEY
+from app.core.environs import SECRET_KEY
 from app.core.security import verify_password
 from app.db.database import SessionLocal
 from app.db.models import User
