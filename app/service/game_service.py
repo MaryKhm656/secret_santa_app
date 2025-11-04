@@ -93,25 +93,25 @@ class GameService:
             join_request = JoinRequestService.create_join_request(
                 db, user_id, game.id, game.organizer_id
             )
-            notification_for_user = NotificationService.create_notification(
-                db, user_id, game.id, text=NotificationsData.JOIN_REQUEST_HAS_BEEN_SEND
-            )
             notification_for_organizer = NotificationService.create_notification(
-                db, game.organizer_id, game.id, NotificationsData.NEW_JOIN_REQUEST
+                db, game.id, NotificationsData.NEW_JOIN_REQUEST
             )
+            receiver_organizer = NotificationService.send_notification_to_users(db, [game.organizer_id],
+                                                                                notification_for_organizer)
             return JoinResult(
                 join_request=join_request,
-                notifications=[notification_for_user, notification_for_organizer],
+                notification_receiver=receiver_organizer,
             )
         else:
             participant = ParticipantService.create_participant(db, user_id, game.id)
-            notification = NotificationService.create_notification(
+            notification_for_user = NotificationService.create_notification(
                 db,
-                game.organizer_id,
                 game.id,
                 NotificationsData.NEW_PARTICIPANT_IN_GAME,
             )
-            return JoinResult(participant=participant, notifications=[notification])
+            receiver_user = NotificationService.send_notification_to_users(db, [participant.user_id],
+                                                                           notification_for_user)
+            return JoinResult(participant=participant, notification_receiver=receiver_user)
 
     @staticmethod
     def join_the_game_after_accept_request(
@@ -122,11 +122,12 @@ class GameService:
                 db, user_id, join_request.game_id
             )
             notification = NotificationService.create_notification(
-                db, user_id, join_request.game_id, NotificationsData.ACCEPT_JOIN_REQUEST
+                db, join_request.game_id, NotificationsData.ACCEPT_JOIN_REQUEST
             )
+            receiver = NotificationService.send_notification_to_users(db, [user_id], notification)
             join_result = JoinResult(
                 participant=participant,
-                notifications=[notification]
+                notification_receiver=receiver
             )
             return join_result
         elif join_request.status == JoinRequestStatus.PENDING:

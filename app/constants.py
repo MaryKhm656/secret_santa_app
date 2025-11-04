@@ -26,10 +26,6 @@ class JoinRequestStatus:
 
 
 class NotificationsData:
-    JOIN_REQUEST_HAS_BEEN_SEND = (
-        "Запрос на вступление в игру успешно отправлен!\n"
-        "Мы пришлем уведомление о решении организатора игры"
-    )
     NEW_JOIN_REQUEST = "У вас новый запрос на вступление в игру! Проверьте запросы."
     NEW_PARTICIPANT_IN_GAME = "Новый пользователь в вашей игре!"
     ACCEPT_JOIN_REQUEST = (
