@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Optional
+from typing import Optional, Union
 
 from app.core.security import generate_secret_key_for_game
 
@@ -13,4 +13,4 @@ class GameCreateData:
     secret_key: str = generate_secret_key_for_game()
     description: Optional[str] = None
     budget: Optional[float] = None
-    event_date: Optional[datetime] = None
+    event_date: Union[datetime, str] = None

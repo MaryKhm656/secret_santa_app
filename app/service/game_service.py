@@ -1,10 +1,10 @@
 from datetime import datetime
-from typing import Optional, Tuple, Union
+from typing import Optional, Union
 
 from sqlalchemy.orm import Session
 
 from app.constants import JoinRequestStatus, NotificationsData
-from app.db.models import Game, JoinRequest, Notification, Participant, User
+from app.db.models import Game, JoinRequest, Participant, User
 from app.schemas.games import GameCreateData
 from app.schemas.join_requests import JoinResult
 from app.service.join_requset_service import JoinRequestService
@@ -21,7 +21,7 @@ class GameService:
                 event_date = None
             else:
                 try:
-                    event_date = datetime.strptime(event_date, "%Y-%m-%d %H-%M")
+                    event_date = datetime.strptime(event_date, "%Y-%m-%d %H:%M")
                 except ValueError:
                     raise ValueError(
                         "Неверный формат даты. Ожидается формат: 'YYYY-MM-DD HH:MM'"
@@ -61,7 +61,7 @@ class GameService:
 
     @staticmethod
     def find_game_by_secret_key(db: Session, secret_key: str) -> Optional[Game]:
-        return db.query(Game).filter_by(Game.secret_key == secret_key).first()
+        return db.query(Game).filter(Game.secret_key==secret_key).first()
 
     @staticmethod
     def join_the_game(db: Session, user_id: int, secret_key: str) -> JoinResult:
@@ -112,7 +112,7 @@ class GameService:
     @staticmethod
     def join_the_game_after_accept_request(
         db: Session, user_id: int, join_request: JoinRequest
-    ) -> Optional[Tuple[Participant, Notification]]:
+    ) -> JoinResult:
         if join_request.status == JoinRequestStatus.APPROVED:
             participant = ParticipantService.create_participant(
                 db, user_id, join_request.game_id
@@ -120,7 +120,11 @@ class GameService:
             notification = NotificationService.create_notification(
                 db, user_id, join_request.game_id, NotificationsData.ACCEPT_JOIN_REQUEST
             )
-            return participant, notification
+            join_result = JoinResult(
+                participant=participant,
+                notifications=[notification]
+            )
+            return join_result
         elif join_request.status == JoinRequestStatus.PENDING:
             raise ValueError("Организатор ещё не принял ваш запрос. Чуточку терпения!")
         else:
