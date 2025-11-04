@@ -2,6 +2,7 @@ class GameStatus:
     DRAFT = "draft"
     ACTIVE = "active"
     COMPLETED = "completed"
+    ALL = [DRAFT, ACTIVE, COMPLETED]
 
 
 class GiftStatus:

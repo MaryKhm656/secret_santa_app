@@ -4,7 +4,6 @@ from app.db.models import (
     Game,
     JoinRequest,
     Participant,
-    Restriction,
     Draw,
     DrawAssignment,
     Gift,

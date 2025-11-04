@@ -3,9 +3,9 @@ from typing import Optional, Union
 
 from sqlalchemy.orm import Session
 
-from app.constants import JoinRequestStatus, NotificationsData
+from app.constants import JoinRequestStatus, NotificationsData, GameStatus
 from app.db.models import Game, JoinRequest, Participant, User
-from app.schemas.games import GameCreateData
+from app.schemas.games import GameCreateData, GameUpdateData
 from app.schemas.join_requests import JoinResult
 from app.service.join_requset_service import JoinRequestService
 from app.service.notification_service import NotificationService
@@ -40,18 +40,22 @@ class GameService:
 
         game_data.event_date = GameService._validate_event_date(game_data.event_date)
 
+        if game_data.budget and game_data.budget < 0:
+            raise ValueError("Бюджет игры не может быть отрицательным")
+
         user = db.get(User, game_data.organizer_id)
         if not user:
             raise ValueError("Организатор с таким ID не найден")
 
         game = Game(
-            title=game_data.title,
+            title=game_data.title.strip(),
             description=game_data.description,
             budget=game_data.budget,
             event_date=game_data.event_date,
             secret_key=game_data.secret_key,
             organizer_id=game_data.organizer_id,
             is_private=game_data.is_private,
+            status=game_data.status.lower().strip()
         )
         db.add(game)
         db.commit()
@@ -129,3 +133,42 @@ class GameService:
             raise ValueError("Организатор ещё не принял ваш запрос. Чуточку терпения!")
         else:
             raise ValueError("Организатор отклонил ваш запрос на вступление в игру!")
+
+    @staticmethod
+    def update_game_data(db: Session, game_id: int, new_game_data: GameUpdateData, organizer_id: int) -> Game:
+        game = db.get(Game, game_id)
+        if not game:
+            raise ValueError("Игра не найдена!")
+
+        if game.organizer_id != organizer_id:
+            raise ValueError("Данные действия доступны только организатору игры")
+
+        if new_game_data.title:
+            if len(new_game_data.title.strip()) < 2:
+                raise ValueError("Слишком короткое название игры")
+            game.title = new_game_data.title.strip()
+
+        if new_game_data.is_private:
+            game.is_private = new_game_data.is_private
+
+        if new_game_data.secret_key:
+            game.secret_key = new_game_data.secret_key
+
+        if new_game_data.description:
+            game.description = new_game_data.description
+
+        if new_game_data.budget:
+            if new_game_data.budget < 0:
+                raise ValueError("Бюджет игры не может быть отрицательным")
+            game.budget = new_game_data.budget
+
+        if new_game_data.event_date:
+            new_game_data.event_date = GameService._validate_event_date(new_game_data.event_date)
+            game.event_date = new_game_data.event_date
+
+        if new_game_data.status:
+            if new_game_data.status.lower().strip() not in GameStatus.ALL:
+                raise ValueError("Недопустимый статус игры")
+            game.status = new_game_data.status.lower().strip()
+
+        return game

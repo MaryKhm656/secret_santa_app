@@ -94,9 +94,6 @@ class Game(Base):
         cascade="all, delete-orphan",
         passive_deletes=True,
     )
-    restrictions = relationship(
-        "Restriction", back_populates="game", cascade="all, delete-orphan"
-    )
     draws = relationship("Draw", back_populates="game", cascade="all, delete-orphan")
     gifts = relationship("Gift", back_populates="game", cascade="all, delete-orphan")
 
@@ -155,28 +152,6 @@ class Participant(Base):
     gifts = relationship(
         "Gift", back_populates="participant", foreign_keys="[Gift.participant_id]", cascade="all, delete-orphan"
     )
-
-
-class Restriction(Base):
-    """Ограничение жеребьёвки (чёрный список) в рамках игры.
-
-    Хранит пару участников: participant_id не должен дарить excluded_participant_id.
-    """
-
-    __tablename__ = "restrictions"
-
-    id = Column(Integer, primary_key=True)
-    game_id = Column(
-        Integer, ForeignKey("games.id", ondelete="CASCADE"), nullable=False
-    )
-    participant_id = Column(
-        Integer, ForeignKey("participants.id", ondelete="CASCADE"), nullable=False
-    )
-    excluded_participant_id = Column(
-        Integer, ForeignKey("participants.id", ondelete="CASCADE"), nullable=False
-    )
-
-    game = relationship("Game", back_populates="restrictions")
 
 
 class Draw(Base):
