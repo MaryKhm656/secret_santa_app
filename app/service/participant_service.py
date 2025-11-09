@@ -45,3 +45,18 @@ class ParticipantService:
             raise ValueError("Данные действия доступны только организатору игры")
 
         return db.query(Participant).filter(Participant.game_id == game.id).all()
+
+    @staticmethod
+    def update_participant_wishlist(
+        db: Session, participant_id: int, wishlist: str
+    ) -> str:
+        participant = db.get(Participant, participant_id)
+        if not participant:
+            raise ValueError("Участник не найден")
+
+        participant.wishlist = wishlist
+
+        db.commit()
+        db.refresh(participant)
+
+        return "Данные успешно обновлены"
