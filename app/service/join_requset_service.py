@@ -10,7 +10,10 @@ class JoinRequestService:
         db: Session, user_id: int, game_id: int, organizer_id: int
     ) -> JoinRequest:
         if user_id == organizer_id:
-            raise ValueError("Вы являетесь организатором игры и не можете отправить запрос на вступление.")
+            raise ValueError(
+                "Вы являетесь организатором игры и не можете "
+                "отправить запрос на вступление."
+            )
 
         user = db.get(User, user_id)
         if not user:

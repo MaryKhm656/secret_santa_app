@@ -59,10 +59,7 @@ class User(Base):
         back_populates="receiver_user",
         foreign_keys="Message.receiver_user_id",
     )
-    notifications_receiver = relationship(
-        "NotificationReceiver",
-        back_populates="user"
-    )
+    notifications_receiver = relationship("NotificationReceiver", back_populates="user")
 
 
 class Game(Base):
@@ -151,7 +148,10 @@ class Participant(Base):
     )
 
     gifts = relationship(
-        "Gift", back_populates="participant", foreign_keys="[Gift.participant_id]", cascade="all, delete-orphan"
+        "Gift",
+        back_populates="participant",
+        foreign_keys="[Gift.participant_id]",
+        cascade="all, delete-orphan",
     )
 
 
@@ -269,7 +269,9 @@ class Notification(Base):
     __tablename__ = "notifications"
 
     id = Column(Integer, primary_key=True)
-    game_id = Column(Integer, ForeignKey("games.id", ondelete="CASCADE"), nullable=False)
+    game_id = Column(
+        Integer, ForeignKey("games.id", ondelete="CASCADE"), nullable=False
+    )
     text = Column(Text, nullable=False)
     created_at = Column(DateTime, default=now)
 
@@ -281,14 +283,18 @@ class NotificationReceiver(Base):
     Получатель конкретного уведомления.
     Позволяет отправлять одно уведомление нескольким пользователям
     """
+
     __tablename__ = "notification_receiver"
 
     id = Column(Integer, primary_key=True)
-    notification_id = Column(Integer, ForeignKey("notifications.id", ondelete="CASCADE"), nullable=False)
-    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    notification_id = Column(
+        Integer, ForeignKey("notifications.id", ondelete="CASCADE"), nullable=False
+    )
+    user_id = Column(
+        Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False
+    )
     is_read = Column(Boolean, default=False)
     read_at = Column(DateTime)
 
     notifications = relationship("Notification", back_populates="receivers")
     user = relationship("User", back_populates="notifications_receiver")
-

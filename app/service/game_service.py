@@ -1,9 +1,10 @@
 from datetime import datetime
-from typing import Optional, Union
+from typing import List, Optional, Union
 
+from sqlalchemy import or_
 from sqlalchemy.orm import Session
 
-from app.constants import JoinRequestStatus, NotificationsData, GameStatus
+from app.constants import GameStatus, JoinRequestStatus, NotificationsData
 from app.db.models import Game, JoinRequest, Participant, User
 from app.schemas.games import GameCreateData, GameUpdateData
 from app.schemas.join_requests import JoinResult
@@ -55,7 +56,7 @@ class GameService:
             secret_key=game_data.secret_key,
             organizer_id=game_data.organizer_id,
             is_private=game_data.is_private,
-            status=game_data.status.lower().strip()
+            status=game_data.status.lower().strip(),
         )
         db.add(game)
         db.commit()
@@ -65,10 +66,16 @@ class GameService:
 
     @staticmethod
     def find_game_by_secret_key(db: Session, secret_key: str) -> Optional[Game]:
-        return db.query(Game).filter(Game.secret_key==secret_key).first()
+        return db.query(Game).filter(Game.secret_key == secret_key).first()
 
     @staticmethod
     def join_the_game(db: Session, user_id: int, secret_key: str) -> JoinResult:
+        """
+        Присоединение пользователя к игре:
+        - если игра приватная → создаёт заявку и уведомляет организатора;
+        - если открытая → добавляет участника и уведомляет всех.
+        """
+
         game = GameService.find_game_by_secret_key(db, secret_key)
         if not game:
             raise ValueError("Игра по такому секретному ключу не найдена")
@@ -93,25 +100,34 @@ class GameService:
             join_request = JoinRequestService.create_join_request(
                 db, user_id, game.id, game.organizer_id
             )
-            notification_for_organizer = NotificationService.create_notification(
-                db, game.id, NotificationsData.NEW_JOIN_REQUEST
+
+            notification = NotificationService.create_notification(
+                db=db, game_id=game.id, text=NotificationsData.NEW_JOIN_REQUEST
             )
-            receiver_organizer = NotificationService.send_notification_to_users(db, [game.organizer_id],
-                                                                                notification_for_organizer)
+
+            receivers = NotificationService.send_notification_to_users(
+                db=db, user_ids=[game.organizer_id], notification=notification
+            )
+
             return JoinResult(
                 join_request=join_request,
-                notification_receiver=receiver_organizer,
+                notification=notification,
+                receivers=receivers,
             )
-        else:
-            participant = ParticipantService.create_participant(db, user_id, game.id)
-            notification_for_user = NotificationService.create_notification(
-                db,
-                game.id,
-                NotificationsData.NEW_PARTICIPANT_IN_GAME,
-            )
-            receiver_user = NotificationService.send_notification_to_users(db, [participant.user_id],
-                                                                           notification_for_user)
-            return JoinResult(participant=participant, notification_receiver=receiver_user)
+
+        participant = ParticipantService.create_participant(db, user_id, game.id)
+
+        notification = NotificationService.create_notification(
+            db=db, game_id=game.id, text=NotificationsData.NEW_PARTICIPANT_IN_GAME
+        )
+
+        receivers = NotificationService.send_notification_to_users(
+            db=db, user_ids=[game.organizer_id], notification=notification
+        )
+
+        return JoinResult(
+            participant=participant, notification=notification, receivers=receivers
+        )
 
     @staticmethod
     def join_the_game_after_accept_request(
@@ -124,10 +140,11 @@ class GameService:
             notification = NotificationService.create_notification(
                 db, join_request.game_id, NotificationsData.ACCEPT_JOIN_REQUEST
             )
-            receiver = NotificationService.send_notification_to_users(db, [user_id], notification)
+            receiver = NotificationService.send_notification_to_users(
+                db, [user_id], notification
+            )
             join_result = JoinResult(
-                participant=participant,
-                notification_receiver=receiver
+                participant=participant, receivers=receiver, notification=notification
             )
             return join_result
         elif join_request.status == JoinRequestStatus.PENDING:
@@ -136,7 +153,9 @@ class GameService:
             raise ValueError("Организатор отклонил ваш запрос на вступление в игру!")
 
     @staticmethod
-    def update_game_data(db: Session, game_id: int, new_game_data: GameUpdateData, organizer_id: int) -> Game:
+    def update_game_data(
+        db: Session, game_id: int, new_game_data: GameUpdateData, organizer_id: int
+    ) -> Game:
         game = db.get(Game, game_id)
         if not game:
             raise ValueError("Игра не найдена!")
@@ -164,7 +183,9 @@ class GameService:
             game.budget = new_game_data.budget
 
         if new_game_data.event_date:
-            new_game_data.event_date = GameService._validate_event_date(new_game_data.event_date)
+            new_game_data.event_date = GameService._validate_event_date(
+                new_game_data.event_date
+            )
             game.event_date = new_game_data.event_date
 
         if new_game_data.status:
@@ -173,3 +194,37 @@ class GameService:
             game.status = new_game_data.status.lower().strip()
 
         return game
+
+    @staticmethod
+    def get_filtered_user_games(
+        db: Session, user_id: int, role: str = "all", game_status: str = "all"
+    ) -> List[Game]:
+        query = db.query(Game)
+
+        if role == "organizer":
+            query = query.filter(Game.organizer_id == user_id)
+        elif role == "participant":
+            query = query.join(Participant).filter(Participant.user_id == user_id)
+        elif role == "all":
+            query = query.outerjoin(Participant).filter(
+                or_(Game.organizer_id == user_id, Participant.user_id == user_id)
+            )
+        else:
+            raise ValueError("Неверное значение для фильтрации")
+
+        if game_status == GameStatus.ACTIVE:
+            query = query.filter(Game.status == GameStatus.ACTIVE)
+        elif game_status == GameStatus.DRAFT:
+            query = query.filter(Game.status == GameStatus.DRAFT)
+        elif game_status == GameStatus.COMPLETED:
+            query = query.filter(Game.status == GameStatus.COMPLETED)
+        elif game_status == "all":
+            pass
+        else:
+            raise ValueError("Неверное значение для фильтрации")
+
+        games = query.distinct().order_by(Game.created_at.desc()).all()
+        if not games:
+            raise ValueError("У пользователя пока нет игр. Хотите создать игру?")
+        else:
+            return games
