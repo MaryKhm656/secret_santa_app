@@ -12,12 +12,6 @@ class GiftStatus:
     RECEIVED = "received"
 
 
-class DrawStatus:
-    PENDING = "pending"
-    COMPLETED = "completed"
-    ERROR = "error"
-
-
 class JoinRequestStatus:
     PENDING = "pending"
     APPROVED = "approved"
@@ -32,4 +26,7 @@ class NotificationsData:
         "Вы в игре!\n"
         "Организатор принял ваш запрос и теперь вы "
         "можете участвовать в игре Тайного Санты!"
+    )
+    DRAW_IS_COMPLETED = (
+        "Жеребьевка завершена!\nЗагляни в личный кабинет и узнай своего получателя."
     )

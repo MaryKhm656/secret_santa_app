@@ -13,7 +13,7 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import backref, relationship
 
-from app.constants import DrawStatus, GameStatus, GiftStatus, JoinRequestStatus
+from app.constants import GameStatus, GiftStatus, JoinRequestStatus
 from app.db.database import Base
 
 
@@ -100,11 +100,17 @@ class JoinRequest(Base):
     __tablename__ = "join_requests"
 
     id = Column(Integer, primary_key=True)
-    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
-    game_id = Column(Integer, ForeignKey("games.id"), nullable=False)
+    user_id = Column(
+        Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False
+    )
+    game_id = Column(
+        Integer, ForeignKey("games.id", ondelete="CASCADE"), nullable=False
+    )
     created_at = Column(DateTime, default=now)
     status = Column(String(20), default=JoinRequestStatus.PENDING)
-    organizer_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    organizer_id = Column(
+        Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False
+    )
 
     user = relationship("User", foreign_keys=[user_id])
     game = relationship("Game", foreign_keys=[game_id])
@@ -145,6 +151,7 @@ class Participant(Base):
         remote_side=[id],
         backref=backref("assigned_from", uselist=True),
         foreign_keys=[assigned_to_id],
+        post_update=True,
     )
 
     gifts = relationship(
@@ -165,9 +172,14 @@ class Draw(Base):
         Integer, ForeignKey("games.id", ondelete="CASCADE"), nullable=False
     )
     created_at = Column(DateTime, default=now)
-    status = Column(String(20), default=DrawStatus.PENDING)
-    note = Column(Text)
 
+    notification_receivers = relationship(
+        "NotificationReceiver",
+        secondary="notifications",
+        primaryjoin="Draw.game_id==Notification.game_id",
+        secondaryjoin="Notification.id==NotificationReceiver.notification_id",
+        viewonly=True,
+    )
     game = relationship("Game", back_populates="draws")
     assignments = relationship(
         "DrawAssignment", back_populates="draw", cascade="all, delete-orphan"
