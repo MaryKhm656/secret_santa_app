@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Secret Santa{% endblock %}</title>
+
+    <link rel="stylesheet" href="/static/style.css">
+
+    {% block styles %}{% endblock %}
+
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat+Alternates:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="snow-background">
+<header>
+    <nav>
+        <ul class="navbar">
+            <li><a href="/" class="navbar-link">Главная</a></li>
+            {% if current_user %}
+                <li><a href="/games" class="navbar-link">Мои игры</a></li>
+                <li><a href="/recipients" class="navbar-link">Они ждут подарка</a></li>
+                <li><a href="/gifts" class="navbar-link">Подарки</a></li>
+                <li><a href="/chat" class="navbar-link">Чат</a></li>
+                {% if current_user.username %}
+                  <li><a href="/profile" class="navbar-link">{{current_user.username}}</a></li>
+                {% else %}
+                  <li><a href="/profile" class="navbar-link">{{current_user.email}}</a></li>
+                {% endif %}
+            {% else %}
+                <li><a href="/login" class="navbar-link">Войти</a></li>
+                <li><a href="/register" class="navbar-link">Регистрация</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+</header>
+
+<main>
+    {% block content %}
+    {% endblock %}
+</main>
+</body>
+</html>

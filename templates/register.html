@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block title %}Регистрация{% endblock %}
+
+{% block content %}
+<div class="register-container">
+    <div class="star">✨</div>
+    <div class="star">⭐</div>
+    <div class="star">🌟</div>
+    <div class="star">💫</div>
+
+    <h1>Присоединиться к Празднику!</h1>
+
+    {% if error %}
+    <div class="error-message" style="
+        background: rgba(255, 107, 107, 0.2);
+        border: 1px solid rgba(255, 107, 107, 0.5);
+        color: #ffd93d;
+        padding: 1rem;
+        border-radius: 10px;
+        margin-bottom: 1.5rem;
+        text-align: center;
+        backdrop-filter: blur(10px);
+    ">
+        {{ error }}
+    </div>
+    {% endif %}
+
+    <form method="POST" action="/register">
+        <input type="text" name="name" placeholder="Как вас зовут?" required>
+
+        <input type="email" name="email" placeholder="Ваша волшебная почта ✉️" required>
+
+        <input type="password" name="password" placeholder="Секретное заклинание 🔒" required>
+
+        <button class="btn" type="submit">
+            <span>Начать Волшебство! 🎄</span>
+        </button>
+    </form>
+
+    <div class="login-link">
+        Уже с нами? <a href="/login">Войти в мастерскую Санты</a>
+    </div>
+</div>
+{% endblock %}

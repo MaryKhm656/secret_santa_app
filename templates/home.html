@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+
+{% block content %}
+<div class="welcome-container">
+  {% if error %}
+  <p style="color: red">{{ error }}</p>
+  {% endif %}
+    <h1>Хо-Хо-Хо!</h1>
+    <p>Скоро Новый Год, а это значит время дарить подарки!</p>
+    <p>Воспользуйтесь нашим удобным сервисом с друзьями, коллегами, семьей,</p>
+    <p>чтобы праздник прошел незабываемо!</p>
+  {% if current_user %}
+    <div class="buttons">
+      <a href="/join-the-game"><button class="btn">Присоединиться к игре</button></a>
+      <a href="/create-game"><button class="btn">Создать игру</button></a>
+      <a href="/games"><button class="btn">Мои игры</button></a>
+    </div>
+  {% else %}
+    <div class="buttons">
+      <a href="/login"><button class="btn">Войти</button> </a>
+      <a href="/register"><button class="btn">Регистрация</button> </a>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

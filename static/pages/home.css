@@ -1,0 +1,44 @@
+main {
+    padding: 2rem;
+    min-height: calc(100vh - 120px);
+}
+
+.welcome-container {
+    text-align: center;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 3rem 2rem;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(15px);
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Новогодние украшения */
+.welcome-container::before {
+    content: '🎄';
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    font-size: 2rem;
+    animation: bounce 2s ease-in-out infinite;
+}
+
+.welcome-container::after {
+    content: '❄️';
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    font-size: 2rem;
+    animation: spin 3s linear infinite;
+}
+
+.welcome-container p {
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+    line-height: 1.6;
+    color: #e0f7fa;
+}
