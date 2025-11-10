@@ -6,6 +6,7 @@ from starlette.responses import HTMLResponse, RedirectResponse
 from starlette.status import HTTP_302_FOUND
 from starlette.templating import Jinja2Templates
 
+from app.core.auth import login_user
 from app.db.models import User
 from app.dependencies import get_db, get_template_user
 from app.schemas.users import UserCreateData
@@ -60,9 +61,12 @@ async def register_form_submit(
     """
     try:
         user_data = UserCreateData(email=email, password=password, username=username)
-        UserService.create_user(db, user_data)
+        user = UserService.create_user(db, user_data)
 
-        return RedirectResponse(url="/login", status_code=HTTP_302_FOUND)
+        access_token = login_user(user.email, password)
+        response = RedirectResponse(url="/profile", status_code=302)
+        response.set_cookie(key="access_token", value=access_token, httponly=True)
+        return response
 
     except ValidationError as e:
         error_msgs = [f"{err['loc'][0]}: {err['msg']}" for err in e.errors()]
@@ -83,3 +87,15 @@ async def register_form_submit(
             {"request": request, "error": "Ошибка при работе с базой данных"},
             status_code=500,
         )
+
+
+@router.get("/profile", response_class=HTMLResponse)
+async def user_profile(
+    request: Request,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_template_user),
+):
+    return templates.TemplateResponse(
+        "profile.html",
+        {"request": request, "current_user": current_user},
+    )

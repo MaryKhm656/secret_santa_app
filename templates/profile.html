@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+
+{% block title %}Мой профиль{% endblock %}
+
+{% block content %}
+<div class="profile-container">
+    <div class="profile-header">
+        <div class="avatar-section">
+            <div class="avatar-large">
+                {{ current_user.username[0]|upper if current_user.username else current_user.email[0]|upper }}
+            </div>
+            <h1>Привет, {{ current_user.username or current_user.email }}! 🎅</h1>
+            <p class="profile-subtitle">Готовь мешок - пора дарить подарки!</p>
+        </div>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-number">2</div>
+            <div class="stat-label">Активных игр</div>
+            <div class="stat-emoji">🎮</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">2</div>
+            <div class="stat-label">Подарков отправлено</div>
+            <div class="stat-emoji">🎁</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">2</div>
+            <div class="stat-label">Подарков получено</div>
+            <div class="stat-emoji">📦</div>
+        </div>
+    </div>
+
+    <!-- Основные разделы -->
+    <div class="profile-sections">
+        <!-- Вишлист -->
+        <section class="profile-section">
+            <h2>🎄 Мой вишлист</h2>
+            <div class="wishlist-content">
+                {% if current_user.wishlist %}
+                    <p>{{ current_user.wishlist }}</p>
+                {% else %}
+                    <p class="empty-state">Расскажи Санте о своих желаниях! 🎁</p>
+                {% endif %}
+                <button class="btn btn-secondary" onclick="editWishlist()">
+                    {{ 'Изменить' if current_user.wishlist else 'Добавить' }} вишлист
+                </button>
+            </div>
+        </section>
+
+        <!-- Быстрые действия -->
+        <section class="profile-section">
+            <h2>⚡ Быстрые действия</h2>
+            <div class="action-buttons">
+                <a href="/create-game" class="action-btn">
+                    <span class="action-emoji">✨</span>
+                    <span>Создать игру</span>
+                </a>
+                <a href="/games" class="action-btn">
+                    <span class="action-emoji">🎮</span>
+                    <span>Мои игры</span>
+                </a>
+                <a href="/gifts" class="action-btn">
+                    <span class="action-emoji">🎁</span>
+                    <span>Мои подарки</span>
+                </a>
+                <a href="/chat" class="action-btn">
+                    <span class="action-emoji">💬</span>
+                    <span>Чат с сантами</span>
+                </a>
+            </div>
+        </section>
+
+        <!-- Настройки -->
+        <section class="profile-section">
+            <h2>⚙️ Настройки</h2>
+            <div class="settings-list">
+                <div class="setting-item">
+                    <span>👤 Имя пользователя</span>
+                    <span class="setting-value">{{ current_user.username or 'Не установлено' }}</span>
+                </div>
+                <div class="setting-item">
+                    <span>📧 Email</span>
+                    <span class="setting-value">{{ current_user.email }}</span>
+                </div>
+                <div class="setting-item">
+                    <span>🔔 Уведомления</span>
+                    <span class="setting-value">Включены</span>
+                </div>
+                <div class="setting-actions">
+                    <button class="btn btn-outline">Изменить пароль</button>
+                    <button class="btn btn-outline">Настройки уведомлений</button>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+
+<!-- Модалка для редактирования вишлиста -->
+<div id="wishlistModal" class="modal">
+    <div class="modal-content">
+        <h3>🎁 Мой вишлист</h3>
+        <form method="POST" action="/update-wishlist">
+            <textarea name="wishlist" placeholder="Расскажи, что ты хочешь на Новый Год... 🎄" 
+                     rows="5">{{ current_user.wishlist or '' }}</textarea>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-secondary" onclick="closeModal()">Отмена</button>
+                <button type="submit" class="btn btn-primary">Сохранить</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function editWishlist() {
+    document.getElementById('wishlistModal').style.display = 'flex';
+}
+
+function closeModal() {
+    document.getElementById('wishlistModal').style.display = 'none';
+}
+
+// Закрытие модалки по клику вне её
+window.onclick = function(event) {
+    const modal = document.getElementById('wishlistModal');
+    if (event.target === modal) {
+        closeModal();
+    }
+}
+</script>
+{% endblock %}

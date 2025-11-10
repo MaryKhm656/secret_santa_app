@@ -12,22 +12,13 @@
     <h1>Присоединиться к Празднику!</h1>
 
     {% if error %}
-    <div class="error-message" style="
-        background: rgba(255, 107, 107, 0.2);
-        border: 1px solid rgba(255, 107, 107, 0.5);
-        color: #ffd93d;
-        padding: 1rem;
-        border-radius: 10px;
-        margin-bottom: 1.5rem;
-        text-align: center;
-        backdrop-filter: blur(10px);
-    ">
+    <div class="error-message">
         {{ error }}
     </div>
     {% endif %}
 
     <form method="POST" action="/register">
-        <input type="text" name="name" placeholder="Как вас зовут?" required>
+        <input type="text" name="username" placeholder="Как вас зовут?" required>
 
         <input type="email" name="email" placeholder="Ваша волшебная почта ✉️" required>
 
