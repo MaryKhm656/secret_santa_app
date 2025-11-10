@@ -1,3 +1,5 @@
+from typing import Optional
+
 from sqlalchemy.orm import Session
 
 from app.core.security import hash_password
@@ -19,7 +21,7 @@ class UserService:
             raise ValueError("Некорректный email")
 
         existing_user = (
-            db.query(User).filter_by(email=user_data.email, is_active=True).first()
+            db.query(User).filter_by(email=user_data.email, is_deleted=False).first()
         )
         if existing_user:
             raise ValueError("Пользователь с таким email уже существует")
@@ -39,7 +41,7 @@ class UserService:
     def update_user_data(
         db: Session, user_id: int, new_user_data: UserUpdateData
     ) -> User:
-        user = db.get(User, user_id)
+        user = db.query(User).filter(User.id == user_id).first_not_deleted()
         if not user:
             raise ValueError("Пользователь не найден")
 
@@ -58,3 +60,12 @@ class UserService:
         db.refresh(user)
 
         return user
+
+    @staticmethod
+    def delete_user(db: Session, user_id: int) -> Optional[str]:
+        user = db.get(User, user_id)
+        if not user:
+            raise ValueError("Пользователь не найден")
+        user.soft_delete()
+        db.commit()
+        return "Пользователь успешно удален"

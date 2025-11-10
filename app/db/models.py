@@ -21,7 +21,41 @@ def now():
     return datetime.now(timezone.utc)
 
 
-class User(Base):
+class SoftDeleteMixin:
+    is_deleted = Column(Boolean, default=False, nullable=False)
+    deleted_at = Column(DateTime)
+
+    def soft_delete(self) -> None:
+        """Помечает запись в БД как удаленную"""
+        if self.is_deleted:
+            return
+
+        self.is_deleted = True
+        self.deleted_at = now()
+
+        for rel in self.__mapper__.relationships:
+            if rel.viewonly:
+                continue
+
+            if rel.mapper.class_ == User:
+                continue
+
+            related_value = getattr(self, rel.key)
+            if not related_value:
+                continue
+
+            if isinstance(related_value, list):
+                for obj in related_value:
+                    if hasattr(obj, "soft_delete") and not isinstance(obj, User):
+                        obj.soft_delete()
+            else:
+                if hasattr(related_value, "soft_delete") and not isinstance(
+                    related_value, User
+                ):
+                    related_value.soft_delete()
+
+
+class User(Base, SoftDeleteMixin):
     """Пользователь системы.
 
     Создаётся при регистрации. Используется как организатор, участник или админ.
@@ -32,17 +66,17 @@ class User(Base):
 
     id = Column(Integer, primary_key=True)
     username = Column(String(100))
-    email = Column(String(100), unique=True, nullable=False)
+    email = Column(String(100), nullable=False)
     password_hash = Column(String(300), nullable=False)
     wishlist = Column(Text)
-    is_active = Column(Boolean, default=True)
+    is_deleted = Column(Boolean, default=False)
     created_at = Column(DateTime, default=now)
     updated_at = Column(DateTime, onupdate=now)
 
     games_created = relationship(
         "Game",
         back_populates="organizer",
-        cascade="all, delete-orphan",
+        cascade="save-update, merge, expunge, refresh-expire",
         passive_deletes=True,
     )
     participation = relationship(
@@ -62,7 +96,7 @@ class User(Base):
     notifications_receiver = relationship("NotificationReceiver", back_populates="user")
 
 
-class Game(Base):
+class Game(Base, SoftDeleteMixin):
     """Игра (сессия Тайного Санты).
 
     Рекомендуется soft-delete/архивация вместо физического удаления для сохранения истории
@@ -116,7 +150,7 @@ class JoinRequest(Base):
     game = relationship("Game", foreign_keys=[game_id])
 
 
-class Participant(Base):
+class Participant(Base, SoftDeleteMixin):
     """Участник конкретной игры (association User <-> Game).
 
     Хранит статус участия и ссылку на того, кому участник дарит подарок
@@ -207,7 +241,7 @@ class DrawAssignment(Base):
     participant_to = relationship("Participant", foreign_keys=[participant_to_id])
 
 
-class Gift(Base):
+class Gift(Base, SoftDeleteMixin):
     """Подарок в рамках игры."""
 
     __tablename__ = "gifts"
@@ -241,7 +275,7 @@ class Gift(Base):
     game = relationship("Game", back_populates="gifts")
 
 
-class Message(Base):
+class Message(Base, SoftDeleteMixin):
     """Сообщение между участниками (анонимное или нет)."""
 
     __tablename__ = "messages"

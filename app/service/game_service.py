@@ -156,7 +156,7 @@ class GameService:
     def update_game_data(
         db: Session, game_id: int, new_game_data: GameUpdateData, organizer_id: int
     ) -> Game:
-        game = db.get(Game, game_id)
+        game = db.query(Game).filter(Game.id == game_id).first_not_deleted()
         if not game:
             raise ValueError("Игра не найдена!")
 
@@ -228,3 +228,20 @@ class GameService:
             raise ValueError("У пользователя пока нет игр. Хотите создать игру?")
         else:
             return games
+
+    @staticmethod
+    def delete_game(db: Session, organizer_id: int, game_id: int) -> Optional[str]:
+        organizer = db.get(User, organizer_id)
+        if not organizer:
+            raise ValueError("Пользователь не найден")
+
+        game = db.query(Game).filter(Game.id == game_id).first_not_deleted()
+        if not game:
+            raise ValueError("Игра не найдена")
+
+        if game.organizer_id != organizer.id:
+            raise ValueError("Данные действия доступны только организатору игры")
+
+        game.soft_delete()
+        db.commit()
+        return "Игра успешно удалена"

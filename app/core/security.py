@@ -30,6 +30,8 @@ def generate_secret_key_for_game(db: Session) -> str:
     while True:
         characters = ascii_lowercase + ascii_uppercase + digits
         key = "".join(secrets.choice(characters) for _ in range(10))
-        existing_key = db.query(Game).filter_by(secret_key=key).first()
+        existing_key = (
+            db.query(Game).filter_by(secret_key=key, is_deleted=False).first()
+        )
         if not existing_key:
             return key
