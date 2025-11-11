@@ -7,8 +7,6 @@
 
     <link rel="stylesheet" href="/static/style.css">
 
-    {% block styles %}{% endblock %}
-
     <link href="https://fonts.googleapis.com/css2?family=Montserrat+Alternates:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body class="snow-background">
@@ -26,8 +24,9 @@
                 {% else %}
                   <li><a href="/profile" class="navbar-link">{{current_user.email}}</a></li>
                 {% endif %}
+                <li><a href="/logout" class="navbar-link" onclick="return confirm('Вы уверены, что хотите выйти?');">Выйти</a></li>
             {% else %}
-                <li><a href="/login" class="navbar-link">Войти</a></li>
+                <li><a href="/login" class="navbar-link" >Войти</a></li>
                 <li><a href="/register" class="navbar-link">Регистрация</a></li>
             {% endif %}
         </ul>
@@ -38,5 +37,6 @@
     {% block content %}
     {% endblock %}
 </main>
+{% block scripts %}{% endblock %}
 </body>
 </html>

@@ -141,3 +141,17 @@ async def logout_user():
     response = RedirectResponse(url="/", status_code=302)
     response.delete_cookie("access_token")
     return response
+
+
+@router.post("/update-wishlist", response_class=HTMLResponse)
+async def update_wishlist(
+    request: Request,
+    wishlist_text: str = Form(...),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_template_user),
+):
+    update_user = UserService.update_wishlist(db, current_user.id, wishlist_text)
+
+    return templates.TemplateResponse(
+        "profile.html", {"request": request, "current_user": update_user}
+    )

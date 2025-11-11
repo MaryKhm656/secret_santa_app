@@ -14,24 +14,6 @@
         </div>
     </div>
 
-    <div class="stats-grid">
-        <div class="stat-card">
-            <div class="stat-number">2</div>
-            <div class="stat-label">Активных игр</div>
-            <div class="stat-emoji">🎮</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-number">2</div>
-            <div class="stat-label">Подарков отправлено</div>
-            <div class="stat-emoji">🎁</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-number">2</div>
-            <div class="stat-label">Подарков получено</div>
-            <div class="stat-emoji">📦</div>
-        </div>
-    </div>
-
     <!-- Основные разделы -->
     <div class="profile-sections">
         <!-- Вишлист -->
@@ -102,7 +84,7 @@
     <div class="modal-content">
         <h3>🎁 Мой вишлист</h3>
         <form method="POST" action="/update-wishlist">
-            <textarea name="wishlist" placeholder="Расскажи, что ты хочешь на Новый Год... 🎄" 
+            <textarea name="wishlist_text" placeholder="Расскажи, что ты хочешь на Новый Год... 🎄"
                      rows="5">{{ current_user.wishlist or '' }}</textarea>
             <div class="modal-actions">
                 <button type="button" class="btn btn-secondary" onclick="closeModal()">Отмена</button>

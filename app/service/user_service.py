@@ -62,6 +62,19 @@ class UserService:
         return user
 
     @staticmethod
+    def update_wishlist(db: Session, user_id: int, wishlist_text: str) -> User:
+        user = db.query(User).filter(User.id == user_id).first_not_deleted()
+        if not user:
+            raise ValueError("Пользователь не найден")
+
+        user.wishlist = wishlist_text
+
+        db.commit()
+        db.refresh(user)
+
+        return user
+
+    @staticmethod
     def delete_user(db: Session, user_id: int) -> Optional[str]:
         user = db.get(User, user_id)
         if not user:
