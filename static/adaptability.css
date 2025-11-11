@@ -44,16 +44,16 @@
 }
 
 @media (max-width: 768px) {
-    .register-container {
+    .auth-container {
         margin: 1rem;
         padding: 2rem 1.5rem;
     }
 
-    .register-container h1 {
+    .auth-container h1 {
         font-size: 2rem;
     }
 
-    .register-container input {
+    .auth-container input {
         padding: 1rem 1.2rem;
         font-size: 1rem;
     }

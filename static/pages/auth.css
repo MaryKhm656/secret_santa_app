@@ -1,4 +1,4 @@
-.register-container {
+.auth-container {
     max-width: 500px;
     margin: 2rem auto;
     padding: 3rem 2rem;
@@ -14,7 +14,7 @@
 }
 
 /* Новогодние украшения для формы */
-.register-container::before {
+.auth-container::before {
     content: '🎅';
     position: absolute;
     top: -30px;
@@ -25,7 +25,7 @@
     z-index: 0;
 }
 
-.register-container::after {
+.auth-container::after {
     content: '🦌';
     position: absolute;
     bottom: -40px;
@@ -55,6 +55,6 @@
 }
 
 
-.register-container {
+.auth-container {
     animation: formAppear 0.6s ease-out;
 }

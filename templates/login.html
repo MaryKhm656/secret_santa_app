@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Регистрация{% endblock %}
+{% block title %}Вход{% endblock %}
 
 {% block content %}
 <div class="auth-container">
@@ -9,7 +9,7 @@
     <div class="star">🌟</div>
     <div class="star">💫</div>
 
-    <h1>Присоединиться к Празднику!</h1>
+    <h1>Войти в Мастерскую Санты</h1>
 
     {% if error %}
     <div class="error-message">
@@ -17,9 +17,7 @@
     </div>
     {% endif %}
 
-    <form method="POST" action="/register">
-        <input type="text" name="username" placeholder="Как вас зовут?" required>
-
+    <form method="POST" action="/login">
         <input type="email" name="email" placeholder="Ваша волшебная почта ✉️" required>
 
         <input type="password" name="password" placeholder="Секретное заклинание 🔒" required>
@@ -30,7 +28,7 @@
     </form>
 
     <div class="login-link">
-        Уже с нами? <a href="/login">Войти в мастерскую Санты</a>
+        Ещё не с нами? <a href="/register">Присоединиться к празднику 🎄</a>
     </div>
 </div>
 {% endblock %}

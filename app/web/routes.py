@@ -92,10 +92,52 @@ async def register_form_submit(
 @router.get("/profile", response_class=HTMLResponse)
 async def user_profile(
     request: Request,
-    db: Session = Depends(get_db),
     current_user: User = Depends(get_template_user),
 ):
     return templates.TemplateResponse(
         "profile.html",
         {"request": request, "current_user": current_user},
     )
+
+
+@router.get("/login", response_class=HTMLResponse)
+async def login_form(request: Request, current_user: User = Depends(get_template_user)):
+    return templates.TemplateResponse(
+        "login.html",
+        {"request": request, "current_user": current_user},
+    )
+
+
+@router.post("/login", response_class=HTMLResponse)
+async def login_form_submit(
+    request: Request, email: str = Form(...), password: str = Form(...)
+):
+    try:
+        access_token = login_user(email, password)
+
+        response = RedirectResponse(url="/profile", status_code=302)
+        response.set_cookie(key="access_token", value=access_token, httponly=True)
+        return response
+    except ValueError as e:
+        return templates.TemplateResponse(
+            "login.html", {"request": request, "error": str(e)}, status_code=400
+        )
+    except SQLAlchemyError:
+        return templates.TemplateResponse(
+            "login.html",
+            {"request": request, "error": "Ошибка при работе с базой данных"},
+            status_code=500,
+        )
+
+
+@router.get("/logout")
+async def logout_user():
+    """
+    Logging the user out.
+
+    returns:
+    RedirectResponse: Redirect to the main page with the access token removed
+    """
+    response = RedirectResponse(url="/", status_code=302)
+    response.delete_cookie("access_token")
+    return response
