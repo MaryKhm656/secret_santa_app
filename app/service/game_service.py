@@ -245,3 +245,19 @@ class GameService:
         game.soft_delete()
         db.commit()
         return "Игра успешно удалена"
+
+    @staticmethod
+    def get_game_by_id(db: Session, game_id: int, user_id: int) -> Game:
+        game = db.query(Game).filter(Game.id == game_id).first_not_deleted()
+        if not game:
+            raise ValueError("Игра не найдена")
+        participant = (
+            db.query(Participant)
+            .filter(Participant.game_id == game.id, Participant.user_id == user_id)
+            .first_not_deleted()
+        )
+
+        if game.organizer_id != user_id and participant is None:
+            raise ValueError("Игра не найдена для пользователя")
+
+        return game

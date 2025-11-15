@@ -284,3 +284,25 @@ async def delete_game(
             {"request": request, "current_user": current_user, "error": str(e)},
             status_code=400,
         )
+
+
+@router.get("/game/{game_id}", response_class=HTMLResponse)
+async def get_game(
+    request: Request,
+    game_id: int,
+    current_user: User = Depends(get_template_user),
+    db: Session = Depends(get_db),
+):
+    try:
+        game = GameService.get_game_by_id(db, game_id, current_user.id)
+
+        return templates.TemplateResponse(
+            "game-view.html",
+            {"request": request, "current_user": current_user, "game": game},
+        )
+    except Exception as e:
+        return templates.TemplateResponse(
+            "error.html",
+            {"request": request, "current_user": current_user, "error": e},
+            status_code=500,
+        )

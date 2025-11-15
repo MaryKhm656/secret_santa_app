@@ -5,8 +5,8 @@
 @import url('pages/home.css');
 @import url('pages/auth.css');
 @import url('animations.css');
-@import url('adaptability.css');
 @import url('pages/profile.css');
 @import url('pages/create-game.css');
 @import url('containers.css');
 @import url('pages/games.css');
+@import url('pages/view-game.css');
