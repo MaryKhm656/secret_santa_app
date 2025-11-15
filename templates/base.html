@@ -35,6 +35,11 @@
 
 <main>
     {% block content %}
+    {% if error %}
+    <p style="color: red">{{ error }}</p>
+    {% elif message %}
+    <p style="color: #98FB98">{{ message }}</p>
+    {% endif %}
     {% endblock %}
 </main>
 {% block scripts %}{% endblock %}

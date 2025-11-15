@@ -366,3 +366,27 @@ async def post_edit_game(
             {"request": request, "current_user": current_user, "error": e},
             status_code=500,
         )
+
+
+@router.post("/join-game", response_class=HTMLResponse)
+async def join_game_submit(
+    request: Request,
+    secret_key: str = Form(...),
+    current_user: User = Depends(get_template_user),
+    db: Session = Depends(get_db),
+):
+    """Обработка присоединения к игре"""
+    try:
+        result = GameService.join_the_game(db, current_user.id, secret_key)
+
+        if hasattr(result, "participant"):
+            message = "🎉 Вы успешно присоединились к игре!"
+        else:
+            message = "📨 Заявка на вступление отправлена организатору!"
+
+        return HTMLResponse(content=message, status_code=200)
+
+    except ValueError as e:
+        return HTMLResponse(content=str(e), status_code=400)
+    except Exception as e:
+        return HTMLResponse(content=str(e), status_code=500)

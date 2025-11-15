@@ -6,6 +6,12 @@
     gap: 2rem;
 }
 
+.games-btn-header {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
 .filters-section {
     margin-bottom: 2rem;
 }

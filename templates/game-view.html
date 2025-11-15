@@ -104,7 +104,6 @@
         </div>
 
         <div class="game-sidebar">
-            <!-- Участники -->
             <section class="sidebar-section">
                 <h2>🎅 Участники ({{ game.participants|length }})</h2>
                 <div class="participants-list">
@@ -132,17 +131,16 @@
                     {% endif %}
                 </div>
             </section>
-
+            {% if game.organizer_id == current_user.id %}
             <section class="sidebar-section">
                 <h2>⚡ Действия</h2>
                 <div class="action-buttons-vertical">
-                    {% if game.organizer_id == current_user.id %}
                     <a href="/edit-game/{{ game.id }}" class="btn btn-outline btn-block">
                         🛠️ Управление игрой
                     </a>
-                    {% endif %}
                 </div>
             </section>
+            {% endif %}
 
             <section class="sidebar-section">
                 <h2>📈 Статус</h2>

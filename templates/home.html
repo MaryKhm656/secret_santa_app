@@ -8,11 +8,10 @@
   {% endif %}
     <h1>Хо-Хо-Хо!</h1>
     <p>Скоро Новый Год, а это значит время дарить подарки!</p>
-    <p>Воспользуйтесь нашим удобным сервисом с друзьями, коллегами, семьей,</p>
-    <p>чтобы праздник прошел незабываемо!</p>
+    <p>Воспользуйтесь нашим удобным сервисом с друзьями, коллегами, семьей, чтобы праздник прошел незабываемо!</p>
   {% if current_user %}
     <div class="buttons">
-      <a href="/join-the-game"><button class="btn">Присоединиться к игре</button></a>
+      <a href="#" onclick="showJoinModal()"><button class="btn">Присоединиться к игре</button></a>
       <a href="/create-game"><button class="btn">Создать игру</button></a>
       <a href="/games"><button class="btn">Мои игры</button></a>
     </div>
@@ -23,4 +22,83 @@
     </div>
   {% endif %}
 </div>
+    </div><div id="joinGameModal" class="modal">
+    <div class="modal-content join-modal">
+        <div class="modal-header">
+            <h3>🎮 Присоединиться к игре</h3>
+            <button class="close-btn" onclick="closeJoinModal()">&times;</button>
+        </div>
+
+        <form method="POST" action="/join-game" id="joinForm">
+            <div class="form-group">
+                <label for="secret_key">Секретный ключ игры</label>
+                <input type="text" id="secret_key" name="secret_key"
+                       placeholder="Введите ключ, который вам дали"
+                       required maxlength="10"
+                       pattern="[A-Za-z0-9]+"
+                       title="Только буквы и цифры">
+                <div class="form-hint">Ключ состоит из букв и цифр</div>
+            </div>
+
+            <div id="joinError" class="error-message" style="display: none;"></div>
+
+            <div class="modal-actions">
+                <button type="button" class="btn btn-secondary" onclick="closeJoinModal()">Отмена</button>
+                <button type="submit" class="btn btn-primary">Присоединиться</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+function showJoinModal() {
+    document.getElementById('joinGameModal').style.display = 'flex';
+    document.getElementById('secret_key').focus();
+}
+
+function closeJoinModal() {
+    document.getElementById('joinGameModal').style.display = 'none';
+    document.getElementById('joinError').style.display = 'none';
+}
+
+document.getElementById('joinForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+
+    const formData = new FormData(this);
+    const submitBtn = this.querySelector('button[type="submit"]');
+    const errorDiv = document.getElementById('joinError');
+
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '⏳ Присоединяемся...';
+    errorDiv.style.display = 'none';
+
+    try {
+        const response = await fetch('/join-game', {
+            method: 'POST',
+            body: formData
+        });
+
+        if (response.ok) {
+            const message = await response.text();
+            alert(message); // Простое уведомление
+            closeJoinModal();
+            setTimeout(() => window.location.reload(), 500);
+        }
+    } catch (error) {
+        errorDiv.textContent = 'Ошибка сети. Попробуйте еще раз.';
+        errorDiv.style.display = 'block';
+    } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = 'Присоединиться';
+    }
+});
+
+window.onclick = function(event) {
+    const modal = document.getElementById('joinGameModal');
+    if (event.target === modal) {
+        closeJoinModal();
+    }
+}
+</script>
 {% endblock %}
