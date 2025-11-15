@@ -17,3 +17,57 @@ input:focus, textarea:focus, select:focus {
 input::placeholder {
     color: rgba(255, 255, 255, 0.6);
 }
+
+textarea::placeholder {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+form input {
+    padding: 1.2rem 1.5rem;
+    font-size: 1.1rem;
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: 15px;
+    color: white;
+    transition: all 0.3s ease;
+    font-family: 'Montserrat Alternates', sans-serif;
+    backdrop-filter: blur(10px);
+}
+
+form input::placeholder {
+    color: rgba(255, 255, 255, 0.7);
+    font-weight: 300;
+}
+
+form textarea::placeholder {
+    color: rgba(255, 255, 255, 0.7);
+    font-weight: 300;
+}
+
+form input:focus {
+    outline: none;
+    border-color: #ffd93d;
+    background: rgba(255, 255, 255, 0.15);
+    box-shadow:
+        0 0 0 4px rgba(255, 217, 61, 0.2),
+        0 10px 20px rgba(0, 0, 0, 0.2);
+    transform: translateY(-2px);
+}
+
+form input:focus::placeholder {
+    transform: translateX(10px);
+    opacity: 0.5;
+}
+
+form textarea:focus::placeholder {
+    transform: translateX(10px);
+    opacity: 0.5;
+}
+
+form input:valid {
+    border-color: rgba(107, 207, 127, 0.5);
+}
+
+form input:invalid:not(:focus):not(:placeholder-shown) {
+    border-color: rgba(255, 107, 107, 0.5);
+}

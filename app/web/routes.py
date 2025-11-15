@@ -3,7 +3,6 @@ from pydantic import ValidationError
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 from starlette.responses import HTMLResponse, RedirectResponse
-from starlette.status import HTTP_302_FOUND
 from starlette.templating import Jinja2Templates
 
 from app.core.auth import login_user
@@ -154,4 +153,14 @@ async def update_wishlist(
 
     return templates.TemplateResponse(
         "profile.html", {"request": request, "current_user": update_user}
+    )
+
+
+@router.get("/create-game", response_class=HTMLResponse)
+async def get_create_game(
+    request: Request,
+    current_user: User = Depends(get_template_user),
+):
+    return templates.TemplateResponse(
+        "create-game.html", {"request": request, "current_user": current_user}
     )

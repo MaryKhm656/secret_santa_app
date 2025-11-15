@@ -3,7 +3,7 @@
 {% block title %}Мой профиль{% endblock %}
 
 {% block content %}
-<div class="profile-container">
+<div class="content-container">
     <div class="profile-header">
         <div class="avatar-section">
             <div class="avatar-large">
@@ -15,9 +15,9 @@
     </div>
 
     <!-- Основные разделы -->
-    <div class="profile-sections">
+    <div class="content-sections">
         <!-- Вишлист -->
-        <section class="profile-section">
+        <section class="content-section">
             <h2>🎄 Мой вишлист</h2>
             <div class="wishlist-content">
                 {% if current_user.wishlist %}
@@ -32,7 +32,7 @@
         </section>
 
         <!-- Быстрые действия -->
-        <section class="profile-section">
+        <section class="content-section">
             <h2>⚡ Быстрые действия</h2>
             <div class="action-buttons">
                 <a href="/create-game" class="action-btn">
@@ -55,7 +55,7 @@
         </section>
 
         <!-- Настройки -->
-        <section class="profile-section">
+        <section class="content-section">
             <h2>⚙️ Настройки</h2>
             <div class="settings-list">
                 <div class="setting-item">
@@ -71,7 +71,7 @@
                     <span class="setting-value">Включены</span>
                 </div>
                 <div class="setting-actions">
-                    <button class="btn btn-outline">Изменить пароль</button>
+                    <button class="btn btn-outline">Редактировать</button>
                     <button class="btn btn-outline">Настройки уведомлений</button>
                 </div>
             </div>

@@ -4,6 +4,19 @@
     box-sizing: border-box;
 }
 
+:root {
+    --primary-red: #ff6b6b;
+    --primary-yellow: #ffd93d;
+    --primary-green: #6bcf7f;
+    --primary-blue: #4d96ff;
+    --bg-dark: #0c1b33;
+    --bg-gradient: linear-gradient(135deg, #0c1b33 0%, #1a3a5f 50%, #2d5a87 100%);
+
+    --glass-bg: rgba(255, 255, 255, 0.1);
+    --glass-border: rgba(255, 255, 255, 0.2);
+    --shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}
+
 body {
     font-family: 'Montserrat Alternates', sans-serif;
     background: linear-gradient(135deg, #0c1b33 0%, #1a3a5f 50%, #2d5a87 100%);
@@ -17,19 +30,22 @@ body {
 body::before {
     content: '';
     position: fixed;
-    top: 0;
+    top: -100px;
     left: 0;
     width: 100%;
-    height: 100%;
+    height: calc(100% + 200px);
     background-image:
         radial-gradient(2px 2px at 20px 30px, #eee, transparent),
         radial-gradient(2px 2px at 40px 70px, #fff, transparent),
         radial-gradient(1px 1px at 90px 40px, #eee, transparent),
         radial-gradient(1px 1px at 130px 80px, #fff, transparent),
-        radial-gradient(2px 2px at 160px 30px, #eee, transparent);
+        radial-gradient(2px 2px at 160px 30px, #eee, transparent),
+        radial-gradient(1px 1px at 10px 50px, #fff, transparent),
+        radial-gradient(2px 2px at 60px 20px, #eee, transparent),
+        radial-gradient(1px 1px at 110px 60px, #fff, transparent);
     background-repeat: repeat;
     background-size: 200px 100px;
-    animation: snow 10s linear infinite;
+    animation: snow 5s linear infinite;
     pointer-events: none;
     z-index: -1;
 }
@@ -69,52 +85,18 @@ h1 {
     text-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
 }
 
+h2 {
+    margin-bottom: 1.5rem;
+    font-size: 1.5rem;
+    color: var(--primary-yellow);
+}
+
 form {
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
     position: relative;
     z-index: 1;
-}
-
-form input {
-    padding: 1.2rem 1.5rem;
-    font-size: 1.1rem;
-    background: rgba(255, 255, 255, 0.1);
-    border: 2px solid rgba(255, 255, 255, 0.2);
-    border-radius: 15px;
-    color: white;
-    transition: all 0.3s ease;
-    font-family: 'Montserrat Alternates', sans-serif;
-    backdrop-filter: blur(10px);
-}
-
-form input::placeholder {
-    color: rgba(255, 255, 255, 0.7);
-    font-weight: 300;
-}
-
-form input:focus {
-    outline: none;
-    border-color: #ffd93d;
-    background: rgba(255, 255, 255, 0.15);
-    box-shadow:
-        0 0 0 4px rgba(255, 217, 61, 0.2),
-        0 10px 20px rgba(0, 0, 0, 0.2);
-    transform: translateY(-2px);
-}
-
-form input:focus::placeholder {
-    transform: translateX(10px);
-    opacity: 0.5;
-}
-
-form input:valid {
-    border-color: rgba(107, 207, 127, 0.5);
-}
-
-form input:invalid:not(:focus):not(:placeholder-shown) {
-    border-color: rgba(255, 107, 107, 0.5);
 }
 
 .error-message {

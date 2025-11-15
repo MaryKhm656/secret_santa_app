@@ -16,8 +16,12 @@
 }
 
 @keyframes snow {
-    from { transform: translateY(-100px); }
-    to { transform: translateY(100vh); }
+    0% {
+        transform: translateY(0);
+    }
+    100% {
+        transform: translateY(100px);
+    }
 }
 
 @keyframes formAppear {
@@ -42,3 +46,22 @@
     0%, 100% { transform: translateY(0); }
     50% { transform: translateY(-20px); }
 }
+
+@keyframes formSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.content-section {
+    animation: formSlideIn 0.6s ease-out;
+}
+
+.content-section:nth-child(1) { animation-delay: 0.1s; }
+.content-section:nth-child(2) { animation-delay: 0.2s; }
+.content-section:nth-child(3) { animation-delay: 0.3s; }
