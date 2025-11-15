@@ -31,7 +31,6 @@ class GameCreateData:
 class GameUpdateData:
     title: Optional[str] = NOT_PROVIDED
     is_private: Optional[bool] = NOT_PROVIDED
-    secret_key: Optional[str] = NOT_PROVIDED
     description: Optional[str] = NOT_PROVIDED
     budget: Optional[float] = NOT_PROVIDED
     event_date: Union[datetime, str] = NOT_PROVIDED

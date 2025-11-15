@@ -11,7 +11,7 @@ from starlette.templating import Jinja2Templates
 from app.core.auth import login_user
 from app.db.models import User
 from app.dependencies import get_db, get_template_user
-from app.schemas.games import GameCreateData
+from app.schemas.games import GameCreateData, GameUpdateData
 from app.schemas.users import UserCreateData
 from app.service.game_service import GameService
 from app.service.user_service import UserService
@@ -223,7 +223,8 @@ async def create_game_submit(
     current_user: User = Depends(get_template_user),
 ):
     try:
-        event_date_dt = datetime.fromisoformat(event_date.replace("Z", "+00:00"))
+        if event_date:
+            event_date = datetime.fromisoformat(event_date.replace("Z", "+00:00"))
 
         if budget == "":
             budget = None
@@ -237,7 +238,7 @@ async def create_game_submit(
             is_private=is_private,
             description=description,
             budget=budget,
-            event_date=event_date_dt,
+            event_date=event_date,
             status=status,
         )
 
@@ -300,6 +301,65 @@ async def get_game(
             "game-view.html",
             {"request": request, "current_user": current_user, "game": game},
         )
+    except Exception as e:
+        return templates.TemplateResponse(
+            "error.html",
+            {"request": request, "current_user": current_user, "error": e},
+            status_code=500,
+        )
+
+
+@router.get("/edit-game/{game_id}", response_class=HTMLResponse)
+async def get_edit_game(
+    request: Request,
+    game_id: int,
+    current_user: User = Depends(get_template_user),
+    db: Session = Depends(get_db),
+):
+    game = GameService.get_game_by_id(db, game_id, current_user.id)
+
+    return templates.TemplateResponse(
+        "edit-game.html",
+        {"request": request, "game": game, "current_user": current_user},
+    )
+
+
+@router.post("/edit-game/{game_id}", response_class=HTMLResponse)
+async def post_edit_game(
+    request: Request,
+    game_id: int,
+    title: str = Form(...),
+    description: str = Form(None),
+    budget: Optional[str] = Form(None),
+    event_date: str = Form(...),
+    is_private: bool = Form(False),
+    status: str = Form("registration"),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_template_user),
+):
+    try:
+        if event_date:
+            event_date = datetime.fromisoformat(event_date.replace("Z", "+00:00"))
+
+        if budget == "":
+            budget = None
+        else:
+            budget = float(budget)
+
+        new_game_data = GameUpdateData(
+            title=title,
+            is_private=is_private,
+            description=description,
+            budget=budget,
+            event_date=event_date,
+            status=status,
+        )
+
+        GameService.update_game_data(db, game_id, new_game_data, current_user.id)
+
+        response = RedirectResponse(url="/games", status_code=302)
+        return response
+
     except Exception as e:
         return templates.TemplateResponse(
             "error.html",

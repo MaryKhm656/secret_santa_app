@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 
 from app.constants import GameStatus, JoinRequestStatus, NotificationsData
 from app.db.models import Game, JoinRequest, Participant, User
-from app.schemas.games import GameCreateData, GameUpdateData
+from app.schemas.games import NOT_PROVIDED, GameCreateData, GameUpdateData
 from app.schemas.join_requests import JoinResult
 from app.service.join_requset_service import JoinRequestService
 from app.service.notification_service import NotificationService
@@ -168,11 +168,8 @@ class GameService:
                 raise ValueError("Слишком короткое название игры")
             game.title = new_game_data.title.strip()
 
-        if new_game_data.is_private:
+        if new_game_data.is_private is not NOT_PROVIDED:
             game.is_private = new_game_data.is_private
-
-        if new_game_data.secret_key:
-            game.secret_key = new_game_data.secret_key
 
         if new_game_data.description:
             game.description = new_game_data.description
@@ -192,6 +189,9 @@ class GameService:
             if new_game_data.status.lower().strip() not in GameStatus.ALL:
                 raise ValueError("Недопустимый статус игры")
             game.status = new_game_data.status.lower().strip()
+
+        db.commit()
+        db.refresh(game)
 
         return game
 

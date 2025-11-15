@@ -1,12 +1,11 @@
 {% extends "base.html" %}
 
-{% block title %}Создать игру{% endblock %}
+{% block title %}{{ game.title }} | Редактирование{% endblock %}
 
 {% block content %}
 <div class="content-container">
     <div class="game-header">
-        <h1>🎅 Создать Новую Игру</h1>
-        <p>Организуй волшебство для своих друзей!</p>
+        <h1>🎅 Редактирование игры</h1>
     </div>
 
     {% if error %}
@@ -16,14 +15,14 @@
     </div>
     {% endif %}
 
-    <form method="POST" action="/create-game" class="content-sections" id="gameForm">
+    <form method="POST" action="/edit-game/{{ game.id }}" class="content-sections" id="gameForm">
+
         <div class="content-section">
             <h2>📝 Основная информация</h2>
 
             <div class="form-group">
                 <label for="title">Название игры *</label>
-                <input type="text" id="title" name="title"
-                       placeholder="Например: 'Новогоднее чудо в офисе' или 'Семейный Тайный Санта'"
+                <input type="text" value="{{ game.title }}" id="title" name="title"
                        required minlength="2" maxlength="200">
                 <div class="form-hint">Минимум 2 символа</div>
             </div>
@@ -32,7 +31,7 @@
                 <label for="description">Описание игры</label>
                 <textarea id="description" name="description"
                          placeholder="Расскажи участникам о правилах, атмосфере или особых пожеланиях... 🎄"
-                         rows="4" maxlength="1000"></textarea>
+                         rows="4" maxlength="1000">{{ game.description }}</textarea>
                 <div class="char-counter"><span id="descChars">0</span>/1000</div>
             </div>
         </div>
@@ -43,14 +42,14 @@
             <div class="form-row">
                 <div class="form-group">
                     <label for="event_date">Дата начала жеребьевки *</label>
-                    <input type="datetime-local" id="event_date" name="event_date">
+                    <input type="datetime-local" id="event_date" name="event_date" value="{{ game.event_date }}">
                     <div class="form-hint">Когда начнется отбор пар Санта - получатель</div>
                 </div>
 
                 <div class="form-group">
                     <label for="budget">Бюджет на подарок (руб)</label>
                     <input type="number" id="budget" name="budget"
-                           placeholder="500" min="0" step="50">
+                           placeholder="500" min="0" step="50" value="{{ game.budget }}">
                     <div class="form-hint">Оставь пустым, если без ограничений</div>
                 </div>
             </div>
@@ -62,6 +61,7 @@
             <div class="toggle-group">
                 <label class="toggle-label">
                     <input type="checkbox" id="is_private" name="is_private" value="true"
+                        {{ 'checked' if game.is_private else '' }}
                         data-public-text="Участники смогут присоединиться сразу по секретному ключу"
                         data-private-text="Участники смогут присоединиться только после одобрения заявки">
                     <span class="toggle-slider"></span>
@@ -85,42 +85,11 @@
 
         <div class="form-actions">
             <button type="submit" class="btn btn-primary btn-large">
-                🎄 Создать Волшебство!
+                🎄 Применить изменения
             </button>
         </div>
     </form>
 </div>
-
-{% if secret_key %}
-<div id="successModal" class="modal" style="display: flex;">
-    <div class="modal-content success-content">
-        <div class="success-header">
-            <span class="success-emoji">🎉</span>
-            <h3>Игра успешно создана!</h3>
-        </div>
-
-        <div class="success-info">
-            <p>Твоя игра готова к приключениям! Вот секретный ключ для приглашения друзей:</p>
-
-            <div class="secret-key-display">
-                <span class="key-label">Секретный ключ:</span>
-                <span class="key-value" id="generatedKey">{{ secret_key }}</span>
-                <button class="btn-copy" onclick="copySecretKey()">📋</button>
-            </div>
-
-            <div class="success-actions">
-                <button onclick="redirectToGames()" class="btn btn-primary">
-                    Перейти к моим играм
-                </button>
-            </div>
-
-            <div class="success-hint">
-                💡 Не забудь поделиться ключом с друзьями, чтобы они могли присоединиться!
-            </div>
-        </div>
-    </div>
-</div>
-{% endif %}
 {% endblock %}
 
 {% block scripts %}
@@ -149,31 +118,10 @@ const tomorrow = new Date();
 tomorrow.setDate(tomorrow.getDate() + 1);
 document.getElementById('event_date').min = tomorrow.toISOString().slice(0, 16);
 
-// Копирование секретного ключа
-function copySecretKey() {
-    const keyElement = document.getElementById('generatedKey');
-    const keyText = keyElement.textContent;
-
-    navigator.clipboard.writeText(keyText).then(() => {
-        const btn = document.querySelector('.btn-copy');
-        btn.textContent = '✅';
-        setTimeout(() => {
-            btn.textContent = '📋';
-        }, 2000);
-    });
-}
 
 // Редирект на страницу игр
 function redirectToGames() {
     window.location.href = '/games';
-}
-
-// Закрытие модалки
-window.onclick = function(event) {
-    const modal = document.getElementById('successModal');
-    if (event.target === modal) {
-        modal.style.display = 'none';
-    }
 }
 </script>
 {% endblock %}

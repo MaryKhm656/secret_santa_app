@@ -168,7 +168,7 @@
                 <div class="game-actions">
                     <a href="/game/{{ game.id }}" class="btn">Перейти к игре</a>
                     {% if game.organizer_id == current_user.id %}
-                    <a href="/game/{{ game.id }}/edit" class="btn">Редактировать</a>
+                    <a href="/edit-game/{{ game.id }}" class="btn">Редактировать</a>
                     <form action="/delete-game/{{ game.id }}" method="POST" style="display: inline;">
                         <button type="submit" class="btn"
                                 onclick="return confirm('Точно удалить игру? Это действие нельзя отменить!')">
