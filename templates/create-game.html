@@ -64,7 +64,7 @@
 
             <div class="toggle-group">
                 <label class="toggle-label">
-                    <input class="is_private" type="checkbox" id="is_private" name="is_private" value="false"
+                    <input type="checkbox" id="is_private" name="is_private" value="true"
                         data-public-text="Участники смогут присоединиться сразу по секретному ключу"
                         data-private-text="Участники смогут присоединиться только после одобрения заявки">
                     <span class="toggle-slider"></span>
@@ -75,16 +75,16 @@
                 </div>
             </div>
 
-
             <div class="form-group">
                 <label for="status">Статус игры</label>
                 <select id="status" name="status" class="form-select">
-                    <option value="draft">Черновик</option>
                     <option value="active" selected>Активна</option>
+                    <option value="draft">Черновик</option>
                     <option value="completed">Завершена</option>
                 </select>
                 <div class="form-hint">Можно изменить позже</div>
             </div>
+        </div> <!-- Закрывающий тег для content-section -->
 
         <!-- Кнопка создания -->
         <div class="form-actions">
@@ -96,7 +96,8 @@
 </div>
 
 <!-- Модалка успеха (будет показана после создания) -->
-<div id="successModal" class="modal" style="display: none;">
+{% if secret_key %}
+<div id="successModal" class="modal" style="display: flex;">
     <div class="modal-content success-content">
         <div class="success-header">
             <span class="success-emoji">🎉</span>
@@ -108,13 +109,14 @@
 
             <div class="secret-key-display">
                 <span class="key-label">Секретный ключ:</span>
-                <span class="key-value" id="generatedKey">{{ secret_key or 'KEY123' }}</span>
+                <span class="key-value" id="generatedKey">{{ secret_key }}</span>
                 <button class="btn-copy" onclick="copySecretKey()">📋</button>
             </div>
 
             <div class="success-actions">
-                <a href="/games" class="btn btn-secondary">К моим играм</a>
-                <a href="/game/{{ game_id }}" class="btn btn-primary">Перейти к игре</a>
+                <button onclick="redirectToGames()" class="btn btn-primary">
+                    Перейти к моим играм
+                </button>
             </div>
 
             <div class="success-hint">
@@ -123,12 +125,13 @@
         </div>
     </div>
 </div>
+{% endif %}
 {% endblock %}
 
 {% block scripts %}
 <script>
-    //Ползунок приватной игры
-    document.addEventListener('DOMContentLoaded', function() {
+// Ползунок приватной игры
+document.addEventListener('DOMContentLoaded', function() {
     const privacyCheckbox = document.getElementById('is_private');
     const privacyHint = document.getElementById('privacy-hint');
 
@@ -140,6 +143,7 @@
         }
     });
 });
+
 // Счетчик символов для описания
 document.getElementById('description').addEventListener('input', function() {
     document.getElementById('descChars').textContent = this.value.length;
@@ -164,12 +168,10 @@ function copySecretKey() {
     });
 }
 
-// Показ модалки успеха (если есть секретный ключ в данных)
-{% if secret_key %}
-document.addEventListener('DOMContentLoaded', function() {
-    document.getElementById('successModal').style.display = 'flex';
-});
-{% endif %}
+// Редирект на страницу игр
+function redirectToGames() {
+    window.location.href = '/games';
+}
 
 // Закрытие модалки
 window.onclick = function(event) {

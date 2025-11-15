@@ -1,0 +1,236 @@
+{% extends "base.html" %}
+
+{% block title %}Мои игры{% endblock %}
+
+{% block content %}
+<div class="content-container">
+    <div class="games-header">
+        <div class="header-content">
+            <h1>🎮 Мои игры</h1>
+            <p>Здесь собраны все твои новогодние приключения!</p>
+        </div>
+        <a href="/create-game" class="btn btn-primary btn-large">
+            ✨ Создать новую игру
+        </a>
+    </div>
+
+    {% if new_game_key %}
+    <div id="newGameModal" class="modal" style="display: flex;">
+        <div class="modal-content success-content">
+            <div class="success-header">
+                <span class="success-emoji">🎉</span>
+                <h3>Игра успешно создана!</h3>
+            </div>
+            
+            <div class="success-info">
+                <p>Твоя игра готова! Вот секретный ключ для приглашения друзей:</p>
+                
+                <div class="secret-key-display">
+                    <span class="key-label">Секретный ключ:</span>
+                    <span class="key-value" id="generatedKey">{{ new_game_key }}</span>
+                    <button class="btn-copy" onclick="copySecretKey()">📋</button>
+                </div>
+                
+                <div class="success-hint">
+                    💡 Поделись ключом с друзьями, чтобы они могли присоединиться!
+                </div>
+            </div>
+            
+            <div class="modal-actions">
+                <button onclick="closeNewGameModal()" class="btn btn-primary">
+                    Понятно!
+                </button>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="filters-section">
+        <button class="btn btn-outline" onclick="toggleFilters()" id="filtersToggle">
+            🔍 Добавить фильтры
+        </button>
+        
+        <div class="content-section" id="filtersContent" style="display: none;">
+            <form method="GET" action="/games" class="content-sections">
+                <div class="filter-group">
+                    <label>Моя роль:</label>
+                    <div class="filter-options">
+                        <label class="filter-option">
+                            <input type="radio" name="role" value="all" {% if current_role == 'all' %}checked{% endif %}>
+                            <span>Все игры</span>
+                        </label>
+                        <label class="filter-option">
+                            <input type="radio" name="role" value="organizer" {% if current_role == 'organizer' %}checked{% endif %}>
+                            <span>Я организатор</span>
+                        </label>
+                        <label class="filter-option">
+                            <input type="radio" name="role" value="participant" {% if current_role == 'participant' %}checked{% endif %}>
+                            <span>Я участник</span>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="filter-group">
+                    <label>Статус игры:</label>
+                    <div class="filter-options">
+                        <label class="filter-option">
+                            <input type="radio" name="status" value="all" {% if current_status == 'all' %}checked{% endif %}>
+                            <span>Все статусы</span>
+                        </label>
+                        <label class="filter-option">
+                            <input type="radio" name="status" value="draft" {% if current_status == 'draft' %}checked{% endif %}>
+                            <span>Черновики</span>
+                        </label>
+                        <label class="filter-option">
+                            <input type="radio" name="status" value="active" {% if current_status == 'active' %}checked{% endif %}>
+                            <span>Активные</span>
+                        </label>
+                        <label class="filter-option">
+                            <input type="radio" name="status" value="completed" {% if current_status == 'completed' %}checked{% endif %}>
+                            <span>Завершённые</span>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="filter-actions">
+                    <button type="submit" class="btn btn-primary">Применить фильтры</button>
+                    <a href="/games" class="btn btn-secondary">Сбросить</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="content-sections">
+        {% if error %}
+        <div class="empty-state">
+            <div class="empty-emoji">🎄</div>
+            <h3>{{ error }}</h3>
+            <p>Самое время создать первую игру и устроить новогоднее волшебство!</p>
+            <a href="/create-game" class="btn btn-primary">Создать первую игру</a>
+        </div>
+        {% elif not games %}
+        <div class="empty-state">
+            <div class="empty-emoji">🎁</div>
+            <h3>Игры не найдены</h3>
+            <p>Попробуй изменить фильтры или создать новую игру</p>
+            <a href="/create-game" class="btn btn-primary">Создать игру</a>
+        </div>
+        {% else %}
+            {% for game in games %}
+            <div class="game-card">
+                <div class="game-header">
+                    <h3 class="game-title">{{ game.title }}</h3>
+                    <div class="game-meta">
+                        <span class="game-status status-{{ game.status }}">{{ game.status }}</span>
+                        {% if game.organizer_id == current_user.id %}
+                        <span class="game-role organizer">Организатор</span>
+                        {% else %}
+                        <span class="game-role participant">Участник</span>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                {% if game.description %}
+                <p class="game-description">{{ game.description }}</p>
+                {% endif %}
+                
+                <div class="game-details">
+                    <div class="detail-item">
+                        <span class="detail-icon">📅</span>
+                        <span class="detail-text">
+                            {% if game.event_date %}
+                                {{ game.event_date.strftime('%d.%m.%Y %H:%M') }}
+                            {% else %}
+                                Дата не установлена
+                            {% endif %}
+                        </span>
+                    </div>
+                    
+                    {% if game.budget %}
+                    <div class="detail-item">
+                        <span class="detail-icon">💰</span>
+                        <span class="detail-text">Бюджет: {{ game.budget }} руб.</span>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="detail-item">
+                        <span class="detail-icon">🔐</span>
+                        <span class="detail-text">
+                            {% if game.is_private %}
+                                Приватная
+                            {% else %}
+                                Публичная
+                            {% endif %}
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="game-actions">
+                    <a href="/game/{{ game.id }}" class="btn btn-outline">Перейти к игре</a>
+                    {% if game.organizer_id == current_user.id %}
+                    <a href="/game/{{ game.id }}/edit" class="btn btn-outline">Редактировать</a>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Переключение фильтров
+function toggleFilters() {
+    const filtersContent = document.getElementById('filtersContent');
+    const filtersToggle = document.getElementById('filtersToggle');
+    
+    if (filtersContent.style.display === 'none') {
+        filtersContent.style.display = 'block';
+        filtersToggle.innerHTML = '✖️ Скрыть фильтры';
+        filtersToggle.classList.add('active');
+    } else {
+        filtersContent.style.display = 'none';
+        filtersToggle.innerHTML = '🔍 Добавить фильтры';
+        filtersToggle.classList.remove('active');
+    }
+}
+
+// Показываем фильтры если есть выбранные параметры
+window.addEventListener('load', function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('role') || urlParams.get('status')) {
+        toggleFilters();
+    }
+});
+
+// Модалка новой игры
+function closeNewGameModal() {
+    document.getElementById('newGameModal').style.display = 'none';
+    // Удаляем куку
+    document.cookie = "new_game_key=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+}
+
+// Копирование ключа
+function copySecretKey() {
+    const keyElement = document.getElementById('generatedKey');
+    const keyText = keyElement.textContent;
+    
+    navigator.clipboard.writeText(keyText).then(() => {
+        const btn = document.querySelector('.btn-copy');
+        btn.textContent = '✅';
+        setTimeout(() => {
+            btn.textContent = '📋';
+        }, 2000);
+    });
+}
+
+// Закрытие модалки по клику вне её
+window.onclick = function(event) {
+    const modal = document.getElementById('newGameModal');
+    if (event.target === modal) {
+        closeNewGameModal();
+    }
+}
+</script>
+{% endblock %}
