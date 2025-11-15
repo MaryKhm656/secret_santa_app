@@ -66,7 +66,7 @@ class GameService:
 
     @staticmethod
     def find_game_by_secret_key(db: Session, secret_key: str) -> Optional[Game]:
-        return db.query(Game).filter(Game.secret_key == secret_key).first()
+        return db.query(Game).filter(Game.secret_key == secret_key).first_not_deleted()
 
     @staticmethod
     def join_the_game(db: Session, user_id: int, secret_key: str) -> JoinResult:
@@ -199,7 +199,7 @@ class GameService:
     def get_filtered_user_games(
         db: Session, user_id: int, role: str = "all", game_status: str = "all"
     ) -> List[Game]:
-        query = db.query(Game)
+        query = db.query(Game).not_deleted()
 
         if role == "organizer":
             query = query.filter(Game.organizer_id == user_id)

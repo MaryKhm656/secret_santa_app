@@ -192,9 +192,7 @@ async def user_games(
                 "games": games,
                 "current_role": role,
                 "current_status": status,
-                "new_game_key": request.cookies.get(
-                    "new_game_key"
-                ),  # Для показа ключа после создания
+                "new_game_key": request.cookies.get("new_game_key"),
             },
         )
 
@@ -267,4 +265,22 @@ async def create_game_submit(
                 "error": f"Ошибка при создании игры: {str(e)}",
             },
             status_code=500,
+        )
+
+
+@router.post("/delete-game/{game_id}")
+async def delete_game(
+    request: Request,
+    game_id: int,
+    current_user: User = Depends(get_template_user),
+    db: Session = Depends(get_db),
+):
+    try:
+        GameService.delete_game(db, current_user.id, game_id)
+        return RedirectResponse(url="/games", status_code=302)
+    except ValueError as e:
+        return templates.TemplateResponse(
+            "games.html",
+            {"request": request, "current_user": current_user, "error": str(e)},
+            status_code=400,
         )
