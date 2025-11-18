@@ -14,6 +14,7 @@ from app.dependencies import get_db, get_template_user
 from app.schemas.games import GameCreateData, GameUpdateData
 from app.schemas.users import UserCreateData
 from app.service.game_service import GameService
+from app.service.join_requset_service import JoinRequestService
 from app.service.user_service import UserService
 
 templates = Jinja2Templates(directory="templates")
@@ -390,3 +391,73 @@ async def join_game_submit(
         return HTMLResponse(content=str(e), status_code=400)
     except Exception as e:
         return HTMLResponse(content=str(e), status_code=500)
+
+
+@router.get("/requests", response_class=HTMLResponse)
+async def view_requests(
+    request: Request,
+    current_user: User = Depends(get_template_user),
+    db: Session = Depends(get_db),
+):
+    try:
+        sent_requests = JoinRequestService.get_user_join_requests(db, current_user.id)
+
+        pending_requests = JoinRequestService.get_pending_requests_for_organizer(
+            db, current_user.id
+        )
+
+        return templates.TemplateResponse(
+            "requests.html",
+            {
+                "request": request,
+                "current_user": current_user,
+                "sent_requests": sent_requests,
+                "pending_requests": pending_requests,
+            },
+        )
+    except Exception as e:
+        return templates.TemplateResponse(
+            "error.html",
+            {
+                "request": request,
+                "current_user": current_user,
+                "error": f"Ошибка при загрузке заявок: {str(e)}",
+            },
+            status_code=500,
+        )
+
+
+@router.post("/requests/{request_id}/approve", response_class=HTMLResponse)
+async def approve_request(
+    request: Request,
+    request_id: int,
+    current_user: User = Depends(get_template_user),
+    db: Session = Depends(get_db),
+):
+    try:
+        JoinRequestService.approve_join_request(db, request_id, current_user.id)
+        return RedirectResponse(url="/requests", status_code=302)
+    except ValueError as e:
+        return templates.TemplateResponse(
+            "error.html",
+            {"request": request, "current_user": current_user, "error": str(e)},
+            status_code=400,
+        )
+
+
+@router.post("/requests/{request_id}/reject", response_class=HTMLResponse)
+async def reject_request(
+    request: Request,
+    request_id: int,
+    current_user: User = Depends(get_template_user),
+    db: Session = Depends(get_db),
+):
+    try:
+        JoinRequestService.reject_join_request(db, request_id, current_user.id)
+        return RedirectResponse(url="/requests", status_code=302)
+    except ValueError as e:
+        return templates.TemplateResponse(
+            "error.html",
+            {"request": request, "current_user": current_user, "error": str(e)},
+            status_code=400,
+        )

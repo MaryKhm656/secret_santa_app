@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+
+{% block title %}Мои заявки - Secret Santa{% endblock %}
+
+{% block content %}
+<div class="requests-container">
+    <div class="requests-header">
+        <h1>📨 Мои заявки</h1>
+        <p>Здесь отображаются все ваши заявки на вступление в игры</p>
+    </div>
+
+    <div class="content-container">
+        {% if pending_requests %}
+        <section class="content-sections">
+            <h2>⏳ Ожидают моего решения</h2>
+            <p class="section-description">Заявки на вступление в ваши игры</p>
+
+            <div class="content-sections">
+                {% for request in pending_requests %}
+                <div class="content-section">
+                    <div class="request-header">
+                        <h3>{{ request.game.title }}</h3>
+                        <span class="request-badge pending">Ожидает решения</span>
+                    </div>
+
+                    <div class="request-details">
+                        <div class="request-user">
+                            <span class="user-avatar">
+                                {{ request.user.username[0]|upper if request.user.username else request.user.email[0]|upper }}
+                            </span>
+                            <span class="user-info">
+                                <strong>{{ request.user.username or request.user.email }}</strong>
+                                <span>хочет присоединиться к вашей игре</span>
+                            </span>
+                        </div>
+
+                        <div class="request-meta">
+                            <span class="meta-item">📅 {{ request.created_at.strftime('%d.%m.%Y %H:%M') }}</span>
+                        </div>
+                    </div>
+
+                    <div class="request-actions">
+                        <form action="/requests/{{ request.id }}/approve" method="POST" class="inline-form">
+                            <button type="submit" class="btn btn-success">✅ Принять</button>
+                        </form>
+                        <form action="/requests/{{ request.id }}/reject" method="POST" class="inline-form">
+                            <button type="submit" class="btn btn-danger"
+                                    onclick="return confirm('Отклонить заявку от {{ request.user.username or request.user.email }}?')">
+                                ❌ Отклонить
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+        {% endif %}
+
+        <section class="content-sections">
+            <h2>📤 Мои отправленные заявки</h2>
+            <p class="section-description">Заявки, которые вы отправили на вступление в игры</p>
+
+            {% if sent_requests %}
+            <div class="content-sections">
+                {% for request in sent_requests %}
+                <div class="content-section {{ 'approved-card' if request.status == 'approved' else 'rejected-card' if request.status == 'rejected' else 'sent-card' }}">
+                    <div class="request-header">
+                        <h3>{{ request.game.title }}</h3>
+                        <span class="request-badge
+                            {% if request.status == 'approved' %}approved
+                            {% elif request.status == 'rejected' %}rejected
+                            {% else %}pending{% endif %}">
+                            {% if request.status == 'approved' %}✅ Одобрена
+                            {% elif request.status == 'rejected' %}❌ Отклонена
+                            {% else %}⏳ На рассмотрении{% endif %}
+                        </span>
+                    </div>
+
+                    <div class="request-details">
+                        <div class="request-info">
+                            <span>Организатор: <strong>{{ request.game.organizer.username or request.game.organizer.email }}</strong></span>
+                            {% if request.game.description %}
+                            <span class="game-description">{{ request.game.description }}</span>
+                            {% endif %}
+                        </div>
+
+                        <div class="request-meta">
+                            <span class="meta-item">📅 {{ request.created_at.strftime('%d.%m.%Y %H:%M') }}</span>
+                            {% if request.status != 'pending' %}
+                            <span class="meta-item">
+                                {% if request.status == 'approved' %}🎉 Вы в игре!
+                                {% elif request.status == 'rejected' %}😔 Вам отказали
+                                {% endif %}
+                            </span>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    {% if request.status == 'approved' %}
+                    <div class="request-success">
+                        <a href="/game/{{ request.game.id }}" class="btn btn-primary">Перейти к игре</a>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="empty-requests">
+                <div class="empty-emoji">📭</div>
+                <h3>Заявок пока нет</h3>
+                <p>Найдите игру по секретному ключу, чтобы отправить первую заявку!</p>
+                <a href="/games" class="btn btn-primary">Найти игру</a>
+            </div>
+            {% endif %}
+        </section>
+    </div>
+</div>
+{% endblock %}

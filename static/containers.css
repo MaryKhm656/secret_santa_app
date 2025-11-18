@@ -18,6 +18,7 @@
     padding: 2.5rem;
     box-shadow: var(--shadow);
     transition: all 0.3s ease;
+    margin-bottom: 2rem;
 }
 
 .content-section:hover {

@@ -1,0 +1,137 @@
+
+.pending-card {
+    border-left: 4px solid var(--primary-yellow);
+}
+
+.approved-card {
+    border-left: 4px solid var(--primary-green);
+}
+
+.rejected-card {
+    border-left: 4px solid var(--primary-red);
+}
+
+.sent-card {
+    border-left: 4px solid var(--primary-blue);
+}
+
+h2 {
+    margin-bottom: 0;
+}
+
+.request-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+    gap: 1rem;
+}
+
+.requests-header p {
+    text-align: center;
+}
+
+.request-badge {
+    padding: 0.3rem 0.8rem;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.request-badge.pending {
+    background: rgba(255, 217, 61, 0.2);
+    color: var(--primary-yellow);
+}
+
+.request-badge.approved {
+    background: rgba(107, 207, 127, 0.2);
+    color: var(--primary-green);
+}
+
+.request-badge.rejected {
+    background: rgba(255, 107, 107, 0.2);
+    color: var(--primary-red);
+}
+
+
+.request-user {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary-red), var(--primary-yellow));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    color: white;
+    flex-shrink: 0;
+}
+
+.user-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.user-info strong {
+    color: white;
+}
+
+.request-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.game-description {
+    color: rgba(255, 255, 255, 0.7);
+    font-style: italic;
+    font-size: 0.9rem;
+}
+
+.inline-form {
+    display: inline;
+}
+
+.btn-success {
+    background: rgba(107, 207, 127, 0.2);
+    border-color: var(--primary-green);
+    color: var(--primary-green);
+}
+
+.btn-success:hover {
+    background: rgba(107, 207, 127, 0.3);
+}
+
+.request-success {
+    text-align: center;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.empty-requests {
+    text-align: center;
+    padding: 3rem 2rem;
+    background: var(--glass-bg);
+    backdrop-filter: blur(15px);
+    border: 1px solid var(--glass-border);
+    border-radius: 15px;
+}
+
+.empty-emoji {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+.empty-requests p {
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 2rem;
+}
