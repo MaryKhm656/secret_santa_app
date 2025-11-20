@@ -13,6 +13,7 @@ from app.db.models import User
 from app.dependencies import get_db, get_template_user
 from app.schemas.games import GameCreateData, GameUpdateData
 from app.schemas.users import UserCreateData
+from app.service.draw_service import DrawService
 from app.service.game_service import GameService
 from app.service.join_requset_service import JoinRequestService
 from app.service.user_service import UserService
@@ -455,6 +456,26 @@ async def reject_request(
     try:
         JoinRequestService.reject_join_request(db, request_id, current_user.id)
         return RedirectResponse(url="/requests", status_code=302)
+    except ValueError as e:
+        return templates.TemplateResponse(
+            "error.html",
+            {"request": request, "current_user": current_user, "error": str(e)},
+            status_code=400,
+        )
+
+
+@router.post("/game/{game_id}/start-draw", response_class=HTMLResponse)
+async def start_draw(
+    request: Request,
+    game_id: int,
+    current_user: User = Depends(get_template_user),
+    db: Session = Depends(get_db),
+):
+    try:
+        DrawService.start_draw(db, current_user.id, game_id)
+
+        return RedirectResponse(url=f"/game/{game_id}", status_code=302)
+
     except ValueError as e:
         return templates.TemplateResponse(
             "error.html",

@@ -100,6 +100,58 @@
                     </div>
                 </div>
             </section>
+            <section class="info-section">
+                <h2>🎲 Управление жеребьёвкой</h2>
+
+                {% if game.draws %}
+                    <div class="draw-section">
+                        <p>Жеребьёвка уже проведена. Пары участников сформированы.</p>
+                    </div>
+                {% else %}
+                    <div class="draw-section">
+                        <p>Когда все участники присоединились, можно запустить жеребьёвку.</p>
+                        <p><strong>Участников: {{ game.participants|length }}</strong></p>
+
+                        {% if game.participants|length >= 3 %}
+                        <form action="/game/{{ game.id }}/start-draw" method="POST"
+                            onsubmit="return confirm('🎄 Запустить жеребьёвку? После этого участники увидят своих получателей!')">
+                            <button type="submit" class="btn btn-primary btn-large">🎲 Начать жеребьёвку</button>
+                        </form>
+                        {% else %}
+                        <div class="warning-message">
+                            ⚠️ Для жеребьёвки нужно минимум 3 участника
+                        </div>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            </section>
+
+            {% if game.draws %}
+            <section class="info-section">
+                <h2>🎅 Пары участников</h2>
+                <div class="pairs-list">
+                    {% for participant in game.participants %}
+                        {% if participant.assigned_to %}
+                        <div class="pair-item">
+                            <div class="santa">
+                                <span class="user-avatar small">
+                                {{ participant.user.username[0]|upper if participant.user.username else participant.user.email[0]|upper }}
+                                </span>
+                                <span class="user-name">{{ participant.user.username or participant.user.email }}</span>
+                            </div>
+                            <div class="pair-arrow">🎁 →</div>
+                            <div class="receiver">
+                                <span class="user-avatar small">
+                                    {{ participant.assigned_to.user.username[0]|upper if participant.assigned_to.user.username else participant.assigned_to.user.email[0]|upper }}
+                                </span>
+                                <span class="user-name">{{ participant.assigned_to.user.username or participant.assigned_to.user.email }}</span>
+                            </div>
+                        </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </section>
+            {% endif %}
             {% endif %}
         </div>
 

@@ -15,7 +15,7 @@
     border-left: 4px solid var(--primary-blue);
 }
 
-h2 {
+.requests-container h2 {
     margin-bottom: 0;
 }
 
