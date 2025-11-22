@@ -1,0 +1,112 @@
+
+
+.game-header h3 {
+    margin: 0;
+    color: var(--primary-yellow);
+    font-size: 1.3rem;
+}
+
+.gift-info {
+    padding: 1.5rem;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.gift-info.received {
+    border-left: 3px solid var(--primary-blue);
+}
+
+.gift-info.given {
+    border-left: 3px solid var(--primary-green);
+}
+
+.gift-info .gift-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+    padding: 0;
+    border: none;
+}
+
+.gift-info .gift-header h4 {
+    margin: 0;
+    color: white;
+    font-size: 1.2rem;
+}
+
+.gift-description {
+    color: rgba(255, 255, 255, 0.8);
+    line-height: 1.5;
+    margin-bottom: 1rem;
+}
+
+.gift-price {
+    color: var(--primary-yellow);
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+.wishlist-hint {
+    margin-top: 0.5rem;
+    padding: 0.8rem;
+    background: rgba(255, 217, 61, 0.1);
+    border: 1px solid rgba(255, 217, 61, 0.3);
+    border-radius: 8px;
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 0.9rem;
+}
+
+
+.gift-message {
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    text-align: center;
+    color: rgba(255, 255, 255, 0.9);
+    font-style: italic;
+}
+
+/* Действия с подарками */
+.gift-actions {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-top: 1rem;
+}
+
+
+.no-gift-message {
+    text-align: center;
+    padding: 2rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+    border: 2px dashed rgba(255, 255, 255, 0.2);
+}
+
+.message-emoji {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+}
+
+
+.receiver-name {
+    color: var(--primary-yellow) !important;
+}
+
+.wishlist-preview {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 1rem;
+    border-radius: 8px;
+    margin: 1rem 0;
+    text-align: left;
+}
+
+.wishlist-preview strong {
+    color: var(--primary-yellow);
+}
+
+.receiver-details {
+    padding: 1rem;
+}

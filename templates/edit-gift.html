@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block title %}Изменить подарок - Secret Santa{% endblock %}
+
+{% block content %}
+<div class="content-container">
+    <div class="content-header">
+        <h1>🎁 Изменить подарок</h1>
+        <p>Придумалось что-то получше?</p>
+    </div>
+
+    <div class="content-sections">
+        <div class="content-section">
+            <div class="user-avatar">
+                {{ receiver.user.username[0]|upper if receiver.user.username else receiver.user.email[0]|upper }}
+            </div>
+            <div class="receiver-details">
+                <h3>Для: {{ receiver.user.username or receiver.user.email }}</h3>
+                {% if receiver.user.wishlist %}
+                <div class="wishlist-content">
+                    <strong>🎯 Вишлист получателя:</strong>
+                    <p class="wishlist-text">{{ receiver.user.wishlist }}</p>
+                </div>
+                {% else %}
+                <p class="empty-state">📝 Получатель пока не добавил вишлист</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    {% if error %}
+    <div class="error-message">
+        <span class="error-emoji">⚠️</span>
+        {{ error }}
+    </div>
+    {% endif %}
+
+    <form method="POST" action="/game/{{ game.id }}/edit" class="content-sections">
+        <div class="content-section">
+            <h2>📝 Информация о подарке</h2>
+            
+            <div class="form-group">
+                <label for="title">Название подарка *</label>
+                <input type="text" id="title" name="title" value="{{ gift.title }}"
+                       placeholder="Например: 'Книга о программировании' или 'Тёплый шарф'"
+                       required maxlength="255">
+                <div class="form-hint">Краткое описание того, что вы дарите</div>
+            </div>
+
+            <div class="form-group">
+                <label for="description">Описание подарка</label>
+                <textarea id="description" name="description"
+                         placeholder="Расскажите подробнее о подарке, почему выбрали именно его..."
+                         rows="4" maxlength="1000">{{ gift.description }}</textarea>
+                <div class="form-hint">Необязательно, но получателю будет интересно!</div>
+            </div>
+
+            <div class="form-group">
+                <label for="price">Примерная стоимость (руб)</label>
+                <input type="number" id="price" name="price" value="{{ game.price }}"
+                       placeholder="1000" min="0" step="50">
+                <div class="form-hint">Оставьте пустым, если не хотите указывать</div>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <a href="/gifts" class="btn btn-secondary">Отмена</a>
+            <button type="submit" class="btn btn-primary btn-large">
+                🎁 Изменить подарок
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}

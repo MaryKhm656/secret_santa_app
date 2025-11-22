@@ -9,13 +9,16 @@ from starlette.responses import HTMLResponse, RedirectResponse
 from starlette.templating import Jinja2Templates
 
 from app.core.auth import login_user
-from app.db.models import User
+from app.db.models import Gift, Participant, User
 from app.dependencies import get_db, get_template_user
 from app.schemas.games import GameCreateData, GameUpdateData
+from app.schemas.gifts import GiftCreateData, GiftUpdateData
 from app.schemas.users import UserCreateData
 from app.service.draw_service import DrawService
 from app.service.game_service import GameService
+from app.service.gift_service import GiftService
 from app.service.join_requset_service import JoinRequestService
+from app.service.participant_service import ParticipantService
 from app.service.user_service import UserService
 
 templates = Jinja2Templates(directory="templates")
@@ -479,6 +482,222 @@ async def start_draw(
     except ValueError as e:
         return templates.TemplateResponse(
             "error.html",
+            {"request": request, "current_user": current_user, "error": str(e)},
+            status_code=400,
+        )
+
+
+@router.get("/gifts", response_class=HTMLResponse)
+async def view_gifts(
+    request: Request,
+    current_user: User = Depends(get_template_user),
+    db: Session = Depends(get_db),
+):
+    try:
+        games_data = GiftService.get_user_gifts_overview(db, current_user.id)
+
+        return templates.TemplateResponse(
+            "gifts.html",
+            {
+                "request": request,
+                "current_user": current_user,
+                "games_data": games_data,
+            },
+        )
+
+    except Exception as e:
+        return templates.TemplateResponse(
+            "error.html",
+            {
+                "request": request,
+                "current_user": current_user,
+                "error": f"Ошибка при загрузке подарков: {str(e)}",
+            },
+            status_code=500,
+        )
+
+
+@router.get("/game/{game_id}/create-gift", response_class=HTMLResponse)
+async def create_gift_form(
+    request: Request,
+    game_id: int,
+    current_user: User = Depends(get_template_user),
+    db: Session = Depends(get_db),
+):
+    try:
+        game = GameService.get_game_by_id(db, game_id, current_user.id)
+        participant = next(
+            (
+                participant
+                for participant in game.participants
+                if participant.user_id == current_user.id
+            ),
+            None,
+        )
+        receiver = participant.assigned_to
+
+        return templates.TemplateResponse(
+            "create-gift.html",
+            {
+                "request": request,
+                "current_user": current_user,
+                "game": game,
+                "receiver": receiver,
+                "participant": participant,
+            },
+        )
+
+    except ValueError as e:
+        return templates.TemplateResponse(
+            "error.html",
+            {"request": request, "current_user": current_user, "error": str(e)},
+            status_code=400,
+        )
+
+
+@router.post("/game/{game_id}/create-gift", response_class=HTMLResponse)
+async def create_gift_submit(
+    request: Request,
+    game_id: int,
+    title: str = Form(...),
+    description: str = Form(None),
+    price: Optional[str] = Form(None),
+    current_user: User = Depends(get_template_user),
+    db: Session = Depends(get_db),
+):
+    try:
+        game = GameService.get_game_by_id(db, game_id, current_user.id)
+        participant = next(
+            (
+                participant
+                for participant in game.participants
+                if participant.user_id == current_user.id
+            ),
+            None,
+        )
+
+        if price == "":
+            price = None
+        else:
+            price = float(price)
+
+        gift_create_data = GiftCreateData(
+            participant_id=participant.id,
+            receiver_participant_id=participant.assigned_to_id,
+            game_id=game_id,
+            title=title,
+            description=description,
+            price=price,
+        )
+
+        GiftService.create_gift(db, gift_create_data)
+
+        return RedirectResponse(url="/gifts", status_code=302)
+
+    except ValueError as e:
+        return templates.TemplateResponse(
+            "error.html",
+            {"request": request, "current_user": current_user, "error": str(e)},
+            status_code=400,
+        )
+
+
+@router.post("/gifts/{gift_id}/update-status", response_class=HTMLResponse)
+async def update_gift_status(
+    request: Request,
+    gift_id: int,
+    new_status: str = Form(...),
+    current_user: User = Depends(get_template_user),
+    db: Session = Depends(get_db),
+):
+    try:
+        participant = ParticipantService.get_participant_by_user_id(db, current_user.id)
+        GiftService.update_gift_status(db, gift_id, participant.id, new_status)
+        return RedirectResponse(url="/gifts", status_code=302)
+
+    except ValueError as e:
+        return templates.TemplateResponse(
+            "error.html",
+            {"request": request, "current_user": current_user, "error": str(e)},
+            status_code=400,
+        )
+
+
+@router.get("/gifts/{gift_id}/edit", response_class=HTMLResponse)
+async def get_edit_gift(
+    request: Request,
+    gift_id: int,
+    current_user: User = Depends(get_template_user),
+    db: Session = Depends(get_db),
+):
+    gift = GiftService.get_gift_by_id(db, gift_id)
+    game = GameService.get_game_by_id(db, gift.game_id, current_user.id)
+    participant = next(
+        (
+            participant
+            for participant in game.participants
+            if participant.user_id == current_user.id
+        ),
+        None,
+    )
+    receiver = participant.assigned_to
+
+    return templates.TemplateResponse(
+        "edit-gift.html",
+        {
+            "request": request,
+            "current_user": current_user,
+            "gift": gift,
+            "receiver": receiver,
+            "participant": participant,
+            "game": game,
+        },
+    )
+
+
+@router.post("/gifts/{gift_id}/edit", response_class=HTMLResponse)
+async def update_gift_submit(
+    request: Request,
+    gift_id: int,
+    title: str = Form(...),
+    description: str = Form(None),
+    price: Optional[str] = Form(None),
+    current_user: User = Depends(get_template_user),
+    db: Session = Depends(get_db),
+):
+    try:
+        if price == "":
+            price = None
+        else:
+            price = float(price)
+
+        gift_update_data = GiftUpdateData(title, description, price)
+
+        GiftService.update_gift_data(db, gift_update_data, gift_id)
+
+        return RedirectResponse(url="/gifts", status_code=302)
+
+    except ValueError as e:
+        return templates.TemplateResponse(
+            "error.html",
+            {"request": request, "current_user": current_user, "error": str(e)},
+            status_code=400,
+        )
+
+
+@router.post("/gifts/{gift_id}/delete")
+async def delete_gift(
+    request: Request,
+    gift_id: int,
+    current_user: User = Depends(get_template_user),
+    db: Session = Depends(get_db),
+):
+    try:
+        GiftService.delete_gift(db, gift_id)
+        return RedirectResponse(url="/gifts", status_code=302)
+    except ValueError as e:
+        return templates.TemplateResponse(
+            "gifts.html",
             {"request": request, "current_user": current_user, "error": str(e)},
             status_code=400,
         )

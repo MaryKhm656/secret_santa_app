@@ -70,7 +70,6 @@
     margin-bottom: 1rem;
 }
 
-/* Кнопки действий */
 .action-buttons {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -165,28 +164,4 @@
     display: flex;
     gap: 1rem;
     justify-content: flex-end;
-}
-
-/* Адаптивность */
-@media (max-width: 768px) {
-    .profile-container {
-        padding: 0 1rem;
-    }
-
-    .stats-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .action-buttons {
-        grid-template-columns: 1fr;
-    }
-
-    .setting-actions {
-        flex-direction: column;
-    }
-
-    .modal-content {
-        margin: 1rem;
-        width: auto;
-    }
 }

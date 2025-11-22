@@ -60,3 +60,12 @@ class ParticipantService:
         db.refresh(participant)
 
         return "Данные успешно обновлены"
+
+    @staticmethod
+    def get_participant_by_user_id(db: Session, user_id: int) -> Participant:
+        """Getting participant by user id"""
+        return (
+            db.query(Participant)
+            .filter(Participant.user_id == user_id)
+            .first_not_deleted()
+        )

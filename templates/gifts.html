@@ -1,0 +1,224 @@
+{% extends "base.html" %}
+{% block title %}Мои подарки - Secret Santa{% endblock %}
+
+{% block content %}
+<div class="content-container">
+
+    <div class="content-header">
+        <h1>🎁 Мои подарки</h1>
+        <p>Здесь отображаются все подарки во всех ваших играх</p>
+    </div>
+
+    <div class="content-sections">
+        <section class="content-section">
+            <h2>📦 Подарки для меня</h2>
+            <p class="section-description">Подарки, которые готовят вам другие участники</p>
+
+            {% if games_data %}
+            <div class="content-list">
+
+                {% for data in games_data %}
+                {% set gift = data.gift_for_me %}
+                {% if gift or (data.participation.assigned_to_id and data.game.status == 'active') %}
+
+                <div class="content-item-section">
+
+                    <div class="game-header">
+                        <h3>🎮 {{ data.game.title }}</h3>
+                        <span class="game-status status-{{ data.game.status }}">
+                            {{ data.game.status }}
+                        </span>
+                    </div>
+
+                    <div class="content-sections">
+
+                        {% if gift %}
+                        <div class="gift-info received">
+
+                            <div class="gift-header">
+                                <h4>{{ gift.title }}</h4>
+                                <span class="gift-status status-{{ gift.status }}">
+                                    {% if gift.status == 'planned' %}📝 Запланирован
+                                    {% elif gift.status == 'sent' %}🚚 Отправлен
+                                    {% elif gift.status == 'received' %}🎉 Получен
+                                    {% endif %}
+                                </span>
+                            </div>
+
+                            {% if gift.description %}
+                            <p class="gift-description">{{ gift.description }}</p>
+                            {% endif %}
+
+                            {% if gift.price %}
+                            <div class="gift-price">💰 {{ gift.price }} руб.</div>
+                            {% endif %}
+
+                            <div class="gift-meta">
+                                <span class="meta-item">
+                                    📅 Создан: {{ gift.created_at.strftime('%d.%m.%Y') }}
+                                </span>
+                            </div>
+
+                            <div class="gift-message">
+                                {% if gift.status == 'planned' %}
+                                🎅 Ваш Санта уже придумал, что вам подарить!
+                                {% elif gift.status == 'sent' %}
+                                📮 Подарок уже в пути!
+                                {% elif gift.status == 'received' %}
+                                🎉 Вы получили подарок!
+                                {% endif %}
+                            </div>
+
+                        </div>
+
+                        {% else %}
+                        <div class="no-gift-message">
+                            <div class="message-emoji">⏳</div>
+                            <p>Ваш Санта ещё не создал подарок</p>
+                            <p class="hint">Как только подарок появится — он будет здесь</p>
+                        </div>
+                        {% endif %}
+
+                    </div>
+
+                </div>
+                {% endif %}
+                {% endfor %}
+
+            </div>
+            {% else %}
+            <div class="empty-gifts">
+                <div class="empty-emoji">🎄</div>
+                <h3>Нет активных игр с подарками</h3>
+                <p>После жеребьёвки здесь появятся подарки</p>
+            </div>
+            {% endif %}
+        </section>
+        <section class="content-section">
+            <h2>🎅 Подарки, которые я дарю</h2>
+            <p class="section-description">Подарки, которые вы готовите для других участников</p>
+
+            {% if games_data %}
+            <div class="content-list">
+
+                {% for data in games_data %}
+                {% set gift = data.my_gift %}
+                {% set receiver_user = data.participation.assigned_to.user if data.participation.assigned_to else None %}
+
+                {% if receiver_user and data.game.status == 'active' %}
+
+                <div class="content-item-section">
+
+                    <div class="game-header">
+                        <h3>🎮 {{ data.game.title }}</h3>
+                        <span class="game-status status-{{ data.game.status }}">
+                            {{ data.game.status }}
+                        </span>
+                    </div>
+
+                    <div class="content-sections">
+
+                        {% if gift %}
+                        <div class="gift-info given">
+
+                            <div class="gift-header">
+                                <h4>{{ gift.title }}</h4>
+                                <span class="gift-status status-{{ gift.status }}">
+                                    {% if gift.status == 'planned' %}📝 Запланирован
+                                    {% elif gift.status == 'sent' %}🚚 Отправлен
+                                    {% elif gift.status == 'received' %}🎉 Получен
+                                    {% endif %}
+                                </span>
+                            </div>
+
+                            {% if gift.description %}
+                            <p class="gift-description">{{ gift.description }}</p>
+                            {% endif %}
+
+                            {% if gift.price %}
+                            <div class="gift-price">💰 {{ gift.price }} руб.</div>
+                            {% endif %}
+
+                            <div class="gift-receiver">
+                                <strong>Для:</strong> {{ receiver_user.username or receiver_user.email }}
+                                {% if receiver_user.wishlist %}
+                                <div class="wishlist-hint">💡 Вишлист: {{ receiver_user.wishlist }}</div>
+                                {% endif %}
+                            </div>
+
+                            <div class="gift-meta">
+                                <span class="meta-item">
+                                    📅 Создан: {{ gift.created_at.strftime('%d.%m.%Y') }}
+                                </span>
+                                {% if gift.sent_at %}
+                                <span class="meta-item">
+                                    📮 Отправлен: {{ gift.sent_at.strftime('%d.%m.%Y') }}
+                                </span>
+                                {% endif %}
+                                {% if gift.received_at %}
+                                <span class="meta-item">
+                                    🎉 Получен: {{ gift.received_at.strftime('%d.%m.%Y') }}
+                                </span>
+                                {% endif %}
+                            </div>
+
+                            <div class="gift-actions">
+                                <form action="/gifts/{{ gift.id }}/update-status" method="POST" class="status-form">
+                                    <select name="new_status" class="form-select" onchange="this.form.submit()">
+                                        <option value="planned"  {% if gift.status == 'planned' %}selected{% endif %}>Запланирован</option>
+                                        <option value="sent"     {% if gift.status == 'sent' %}selected{% endif %}>Отправлен</option>
+                                        <option value="received" {% if gift.status == 'received' %}selected{% endif %}>Получен</option>
+                                    </select>
+                                    </form>
+
+                                <a href="/gifts/{{ gift.id }}/edit" class="btn btn-outline">Редактировать</a>
+                                <form action="/gifts/{{ gift.id }}/delete" method="POST" style="display: inline;">
+                                    <button type="submit" class="btn"
+                                    onclick="return confirm('Точно удалить игру? Это действие нельзя отменить!')">
+                                    Удалить
+                        </button>
+                    </form>
+                            </div>
+
+                        </div>
+
+                        {% else %}
+                        <div class="no-gift-message">
+                            <div class="message-emoji">🎁</div>
+                            <p>Вы ещё не создали подарок для</p>
+                            <p class="receiver-name">
+                                <strong>{{ receiver_user.username or receiver_user.email }}</strong>
+                            </p>
+
+                            {% if receiver_user.wishlist %}
+                            <div class="wishlist-preview">
+                                <strong>🎯 Вишлист получателя:</strong>
+                                <p>{{ receiver_user.wishlist }}</p>
+                            </div>
+                            {% endif %}
+
+                            <a href="/game/{{ data.game.id }}/create-gift" class="btn btn-primary">
+                                🎁 Создать подарок
+                            </a>
+                        </div>
+                        {% endif %}
+
+                    </div>
+                </div>
+
+                {% endif %}
+                {% endfor %}
+            </div>
+
+            {% else %}
+            <div class="empty-gifts">
+                <div class="empty-emoji">🎁</div>
+                <h3>Нет активных игр для создания подарков</h3>
+                <p>После жеребьёвки в ваших играх вы сможете создавать подарки</p>
+            </div>
+            {% endif %}
+        </section>
+
+    </div>
+</div>
+{% endblock %}

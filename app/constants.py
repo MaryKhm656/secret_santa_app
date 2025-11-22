@@ -10,6 +10,7 @@ class GiftStatus:
     NOT_SENT = "not_sent"
     SENT = "sent"
     RECEIVED = "received"
+    ALL = [PLANNED, NOT_SENT, SENT, RECEIVED]
 
 
 class JoinRequestStatus:

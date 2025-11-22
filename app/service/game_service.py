@@ -223,11 +223,7 @@ class GameService:
         else:
             raise ValueError("Неверное значение для фильтрации")
 
-        games = query.distinct().order_by(Game.created_at.desc()).all()
-        if not games:
-            raise ValueError("У пользователя пока нет игр. Хотите создать игру?")
-        else:
-            return games
+        return query.distinct().order_by(Game.created_at.desc()).all()
 
     @staticmethod
     def delete_game(db: Session, organizer_id: int, game_id: int) -> Optional[str]:
