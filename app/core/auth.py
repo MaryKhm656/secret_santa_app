@@ -64,7 +64,7 @@ def login_user(email: str, password: str) -> str:
     :return JWT access token:
     """
     session = SessionLocal()
-    user = session.query(User).filter_by(email=email).first()
+    user = session.query(User).filter(User.email == email).first_not_deleted()
     session.close()
 
     if not user or not verify_password(password, user.password_hash):
@@ -99,7 +99,7 @@ def get_current_user_from_cookie(request: Request) -> User:
         raise credential_exception
 
     session = SessionLocal()
-    user = session.query(User).filter_by(id=user_id).first()
+    user = session.query(User).filter(User.id == user_id).first_not_deleted()
     session.close()
 
     if not user:

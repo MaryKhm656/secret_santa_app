@@ -4,7 +4,7 @@
 
 {% block content %}
 <div class="content-container">
-    <div class="profile-header">
+    <div class="content-header">
         <div class="avatar-section">
             <div class="avatar-large">
                 {{ current_user.username[0]|upper if current_user.username else current_user.email[0]|upper }}
@@ -14,9 +14,7 @@
         </div>
     </div>
 
-    <!-- Основные разделы -->
     <div class="content-sections">
-        <!-- Вишлист -->
         <section class="content-section">
             <h2>🎄 Мой вишлист</h2>
             <div class="wishlist-content">
@@ -31,7 +29,6 @@
             </div>
         </section>
 
-        <!-- Быстрые действия -->
         <section class="content-section">
             <h2>⚡ Быстрые действия</h2>
             <div class="action-buttons">
@@ -47,14 +44,12 @@
                     <span class="action-emoji">🎁</span>
                     <span>Мои подарки</span>
                 </a>
-                <a href="/chat" class="action-btn">
-                    <span class="action-emoji">💬</span>
-                    <span>Чат с сантами</span>
+                <a href="/requests" class="action-btn">
+                    <span class="action-emoji">📨</span>
+                    <span>Заявки</span>
                 </a>
             </div>
         </section>
-
-        <!-- Настройки -->
         <section class="content-section">
             <h2>⚙️ Настройки</h2>
             <div class="settings-list">
@@ -66,20 +61,20 @@
                     <span>📧 Email</span>
                     <span class="setting-value">{{ current_user.email }}</span>
                 </div>
-                <div class="setting-item">
-                    <span>🔔 Уведомления</span>
-                    <span class="setting-value">Включены</span>
-                </div>
                 <div class="setting-actions">
-                    <button class="btn btn-outline">Редактировать</button>
-                    <button class="btn btn-outline">Настройки уведомлений</button>
+                    <a href="/edit-profile/{{ current_user.id }}" class="btn btn-outline">Редактировать</a>
                 </div>
+                <form action="/delete-user/{{ current_user.id }}" method="POST" style="display: inline;">
+                    <button type="submit" class="btn"
+                            onclick="return confirm('Уверены что хотите удалить профиль?')">
+                        Удалить профиль
+                    </button>
+                </form>
             </div>
         </section>
     </div>
 </div>
 
-<!-- Модалка для редактирования вишлиста -->
 <div id="wishlistModal" class="modal">
     <div class="modal-content">
         <h3>🎁 Мой вишлист</h3>

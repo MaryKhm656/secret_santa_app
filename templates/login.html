@@ -11,12 +11,6 @@
 
     <h1>Войти в Мастерскую Санты</h1>
 
-    {% if error %}
-    <div class="error-message">
-        {{ error }}
-    </div>
-    {% endif %}
-
     <form method="POST" action="/login">
         <input type="email" name="email" placeholder="Ваша волшебная почта ✉️" required>
 

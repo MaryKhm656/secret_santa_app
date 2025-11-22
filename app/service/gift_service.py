@@ -35,15 +35,15 @@ class GiftService:
     ) -> Gift:
         gift = db.query(Gift).filter(Gift.id == gift_id).first_not_deleted()
 
-        if new_gift_data.title:
+        if new_gift_data.title != gift.title:
             if len(new_gift_data.title.strip()) == 0:
                 raise ValueError("Слишком короткое название подарка")
             gift.title = new_gift_data.title
 
-        if new_gift_data.description:
+        if new_gift_data.description != gift.description:
             gift.description = new_gift_data.description
 
-        if new_gift_data.price:
+        if new_gift_data.price != gift.price:
             gift.price = new_gift_data.price
 
         db.commit()

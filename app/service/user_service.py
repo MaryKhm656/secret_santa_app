@@ -53,9 +53,6 @@ class UserService:
                 raise ValueError("Некорректный email")
             user.email = new_user_data.email
 
-        if user.wishlist != new_user_data.wishlist:
-            user.wishlist = new_user_data.wishlist
-
         db.commit()
         db.refresh(user)
 

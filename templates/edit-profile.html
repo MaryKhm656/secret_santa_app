@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block title %}Редактирование профиля - Secret Santa{% endblock %}
+
+{% block content %}
+<div class="content-container">
+    <div class="content-header">
+        <h1>🎅 Редактировать профиль</h1>
+        <p>Хотите что-то изменить?</p>
+    </div>
+
+    <form method="POST" action="/edit-profile/{{ current_user.id }}" class="content-sections">
+        <div class="content-section">
+            <h2>📝 Информация о пользователе</h2>
+
+            <div class="form-group">
+                <label for="username">Ваше имя</label>
+                <input type="text" id="username" name="username" value="{{ current_user.username }}"
+                       placeholder="Как вас зовут?"
+                       required maxlength="255">
+            </div>
+
+            <div class="form-group">
+                <label for="email">Ваше имя</label>
+                <input type="text" id="email" name="email" value="{{ current_user.email }}"
+                       placeholder="Ваша волшебная почта"
+                       required maxlength="255">
+            </div>
+
+        <div class="form-actions">
+            <a href="/profile" class="btn btn-secondary">Отмена</a>
+            <button type="submit" class="btn btn-primary btn-large">
+                🎅 Внести изменения
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}

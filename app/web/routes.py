@@ -13,7 +13,7 @@ from app.db.models import Gift, Participant, User
 from app.dependencies import get_db, get_template_user
 from app.schemas.games import GameCreateData, GameUpdateData
 from app.schemas.gifts import GiftCreateData, GiftUpdateData
-from app.schemas.users import UserCreateData
+from app.schemas.users import UserCreateData, UserUpdateData
 from app.service.draw_service import DrawService
 from app.service.game_service import GameService
 from app.service.gift_service import GiftService
@@ -695,6 +695,56 @@ async def delete_gift(
     try:
         GiftService.delete_gift(db, gift_id)
         return RedirectResponse(url="/gifts", status_code=302)
+    except ValueError as e:
+        return templates.TemplateResponse(
+            "gifts.html",
+            {"request": request, "current_user": current_user, "error": str(e)},
+            status_code=400,
+        )
+
+
+@router.get("/edit-profile/{user_id}", response_class=HTMLResponse)
+async def get_edit_user(
+    request: Request,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_template_user),
+):
+    return templates.TemplateResponse(
+        "edit-profile.html", {"request": request, "current_user": current_user}
+    )
+
+
+@router.post("/edit-profile/{user_id}", response_class=HTMLResponse)
+async def edit_user_data_submit(
+    request: Request,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_template_user),
+    username: str = Form(...),
+    email: str = Form(...),
+):
+    try:
+        new_user_data = UserUpdateData(username, email)
+        UserService.update_user_data(db, current_user.id, new_user_data)
+        return RedirectResponse(url="/profile", status_code=302)
+    except ValueError as e:
+        return templates.TemplateResponse(
+            "edit-profile.html",
+            {"request": request, "current_user": current_user, "error": str(e)},
+        )
+
+
+@router.post("/delete-user/{user_id}")
+async def delete_user(
+    request: Request,
+    user_id: int,
+    current_user: User = Depends(get_template_user),
+    db: Session = Depends(get_db),
+):
+    try:
+        UserService.delete_user(db, user_id)
+        response = RedirectResponse(url="/", status_code=302)
+        response.delete_cookie("access_token")
+        return response
     except ValueError as e:
         return templates.TemplateResponse(
             "gifts.html",

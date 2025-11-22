@@ -15,4 +15,3 @@ class UserCreateData:
 class UserUpdateData:
     username: Optional[str] = NOT_PROVIDED
     email: Optional[str] = NOT_PROVIDED
-    wishlist: Optional[str] = NOT_PROVIDED

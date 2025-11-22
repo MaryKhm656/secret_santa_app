@@ -28,13 +28,6 @@
         </div>
     </div>
 
-    {% if error %}
-    <div class="error-message">
-        <span class="error-emoji">⚠️</span>
-        {{ error }}
-    </div>
-    {% endif %}
-
     <form method="POST" action="/game/{{ game.id }}/edit" class="content-sections">
         <div class="content-section">
             <h2>📝 Информация о подарке</h2>
