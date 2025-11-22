@@ -35,13 +35,11 @@
     }
 }
 
-/* Мигающие огоньки */
 @keyframes twinkle {
     0%, 100% { opacity: 0.2; }
     50% { opacity: 1; }
 }
 
-/* Плавающие элементы */
 @keyframes float {
     0%, 100% { transform: translateY(0); }
     50% { transform: translateY(-20px); }

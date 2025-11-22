@@ -4,7 +4,7 @@
 
 {% block content %}
 <div class="game-view-container">
-    <div class="game-header-section">
+    <div class="games-header">
         <div class="game-title-section">
             <h1>{{ game.title }}</h1>
             <div class="game-meta-badges">
@@ -28,9 +28,9 @@
     </div>
 
     <div class="game-content-sections">
-        <div class="game-info-column">
+        <div class="content-sections">
             {% if game.description %}
-            <section class="info-section">
+            <section class="content-section">
                 <h2>📖 Описание игры</h2>
                 <div class="description-content">
                     {{ game.description }}
@@ -38,7 +38,7 @@
             </section>
             {% endif %}
 
-            <section class="info-section">
+            <section class="content-section">
                 <h2>📊 Детали игры</h2>
                 <div class="details-grid">
                     <div class="detail-card">
@@ -84,7 +84,7 @@
             </section>
 
             {% if game.organizer_id == current_user.id %}
-            <section class="info-section">
+            <section class="content-section">
                 <h2>🔑 Секретный ключ</h2>
                 <div class="secret-key-section">
                     <div class="key-display">
@@ -97,7 +97,7 @@
                     </div>
                 </div>
             </section>
-            <section class="info-section">
+            <section class="content-section">
                 <h2>🎲 Управление жеребьёвкой</h2>
 
                 {% if game.draws %}
@@ -124,7 +124,7 @@
             </section>
 
             {% if game.draws %}
-            <section class="info-section">
+            <section class="content-section">
                 <h2>🎅 Пары участников</h2>
                 <div class="pairs-list">
                     {% for participant in game.participants %}
@@ -152,8 +152,8 @@
             {% endif %}
         </div>
 
-        <div class="game-sidebar">
-            <section class="sidebar-section">
+        <div class="content-sections">
+            <section class="content-section">
                 <h2>🎅 Участники ({{ game.participants|length }})</h2>
                 <div class="participants-list">
                     {% if game.participants %}
@@ -181,7 +181,7 @@
                 </div>
             </section>
             {% if game.organizer_id == current_user.id %}
-            <section class="sidebar-section">
+            <section class="content-section">
                 <h2>⚡ Действия</h2>
                 <div class="action-buttons-vertical">
                     <a href="/edit-game/{{ game.id }}" class="btn btn-outline btn-block">
@@ -191,7 +191,7 @@
             </section>
             {% endif %}
 
-            <section class="sidebar-section">
+            <section class="content-section">
                 <h2>📈 Статус</h2>
                 <div class="game-progress">
                     <div class="progress-item {% if game.status == 'draft' %}active{% endif %}">

@@ -71,9 +71,9 @@ class GameService:
     @staticmethod
     def join_the_game(db: Session, user_id: int, secret_key: str) -> JoinResult:
         """
-        Присоединение пользователя к игре:
-        - если игра приватная → создаёт заявку и уведомляет организатора;
-        - если открытая → добавляет участника и уведомляет всех.
+        A user joins a game:
+            - if the game is private → creates a request and notifies the organizer;
+            - if the game is public → adds a participant and notifies everyone.
         """
 
         game = GameService.find_game_by_secret_key(db, secret_key)
@@ -130,32 +130,10 @@ class GameService:
             )
 
     @staticmethod
-    def join_the_game_after_accept_request(
-        db: Session, user_id: int, join_request: JoinRequest
-    ) -> JoinResult:
-        if join_request.status == JoinRequestStatus.APPROVED:
-            participant = ParticipantService.create_participant(
-                db, user_id, join_request.game_id
-            )
-            notification = NotificationService.create_notification(
-                db, join_request.game_id, NotificationsData.ACCEPT_JOIN_REQUEST
-            )
-            receiver = NotificationService.send_notification_to_users(
-                db, [user_id], notification
-            )
-            join_result = JoinResult(
-                participant=participant, receivers=receiver, notification=notification
-            )
-            return join_result
-        elif join_request.status == JoinRequestStatus.PENDING:
-            raise ValueError("Организатор ещё не принял ваш запрос. Чуточку терпения!")
-        else:
-            raise ValueError("Организатор отклонил ваш запрос на вступление в игру!")
-
-    @staticmethod
     def update_game_data(
         db: Session, game_id: int, new_game_data: GameUpdateData, organizer_id: int
     ) -> Game:
+        """Update game data"""
         game = db.query(Game).filter(Game.id == game_id).first_not_deleted()
         if not game:
             raise ValueError("Игра не найдена!")
@@ -199,6 +177,7 @@ class GameService:
     def get_filtered_user_games(
         db: Session, user_id: int, role: str = "all", game_status: str = "all"
     ) -> List[Game]:
+        """Getting user games by filters"""
         query = db.query(Game).not_deleted()
 
         if role == "organizer":
@@ -227,6 +206,7 @@ class GameService:
 
     @staticmethod
     def delete_game(db: Session, organizer_id: int, game_id: int) -> Optional[str]:
+        """Delete game by soft delete"""
         organizer = db.get(User, organizer_id)
         if not organizer:
             raise ValueError("Пользователь не найден")
@@ -244,6 +224,7 @@ class GameService:
 
     @staticmethod
     def get_game_by_id(db: Session, game_id: int, user_id: int) -> Game:
+        """Getting game by id"""
         game = db.query(Game).filter(Game.id == game_id).first_not_deleted()
         if not game:
             raise ValueError("Игра не найдена")

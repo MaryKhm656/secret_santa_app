@@ -67,7 +67,6 @@
     font-style: italic;
 }
 
-/* Действия с подарками */
 .gift-actions {
     display: flex;
     gap: 1rem;

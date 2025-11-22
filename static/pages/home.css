@@ -17,7 +17,6 @@ main {
     overflow: hidden;
 }
 
-/* Новогодние украшения */
 .welcome-container::before {
     content: '🎄';
     position: absolute;

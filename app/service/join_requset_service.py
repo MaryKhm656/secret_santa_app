@@ -14,6 +14,7 @@ class JoinRequestService:
     def create_join_request(
         db: Session, user_id: int, game_id: int, organizer_id: int
     ) -> JoinRequest:
+        """Create join request for user to game"""
         if user_id == organizer_id:
             raise ValueError(
                 "Вы являетесь организатором игры и не можете "
@@ -39,29 +40,8 @@ class JoinRequestService:
         return join_request
 
     @staticmethod
-    def update_join_request_status(
-        db: Session, new_status: str, join_request_id: int
-    ) -> JoinRequest:
-        join_request = (
-            db.query(JoinRequest)
-            .filter(JoinRequest.id == join_request_id)
-            .first_not_deleted()
-        )
-        if not join_request:
-            raise ValueError("Запрос не найден")
-
-        if new_status not in JoinRequestStatus.ALL:
-            raise ValueError("Недопустимый статус запроса")
-
-        join_request.status = new_status
-
-        db.commit()
-        db.refresh(join_request)
-
-        return join_request
-
-    @staticmethod
     def get_user_join_requests(db: Session, user_id: int) -> List[JoinRequest]:
+        """Get all join requests sent by user"""
         return (
             db.query(JoinRequest)
             .filter(JoinRequest.user_id == user_id)
@@ -74,6 +54,7 @@ class JoinRequestService:
     def get_pending_requests_for_organizer(
         db: Session, organizer_id: int
     ) -> List[JoinRequest]:
+        """Get pending join requests for organizer's games"""
         return (
             db.query(JoinRequest)
             .filter(
@@ -89,6 +70,7 @@ class JoinRequestService:
     def approve_join_request(
         db: Session, request_id: int, organizer_id: int
     ) -> JoinResult:
+        """Approve join request and add user as participant"""
         join_request = (
             db.query(JoinRequest)
             .filter(
@@ -129,6 +111,7 @@ class JoinRequestService:
     def reject_join_request(
         db: Session, request_id: int, organizer_id: int
     ) -> JoinRequest:
+        """Reject join request"""
         join_request = (
             db.query(JoinRequest)
             .filter(

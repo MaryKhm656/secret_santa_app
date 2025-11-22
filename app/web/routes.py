@@ -9,7 +9,7 @@ from starlette.responses import HTMLResponse, RedirectResponse
 from starlette.templating import Jinja2Templates
 
 from app.core.auth import login_user
-from app.db.models import Gift, Participant, User
+from app.db.models import User
 from app.dependencies import get_db, get_template_user
 from app.schemas.games import GameCreateData, GameUpdateData
 from app.schemas.gifts import GiftCreateData, GiftUpdateData
@@ -29,6 +29,7 @@ router = APIRouter()
 
 @router.get("/", response_class=HTMLResponse)
 async def reed_root(request: Request, current_user=Depends(get_template_user)):
+    """Home page"""
     return templates.TemplateResponse(
         "home.html", {"request": request, "current_user": current_user}
     )
@@ -40,12 +41,7 @@ async def register_form(
     message: str = None,
     current_user: User = Depends(get_template_user),
 ):
-    """
-    New user registration page.
-
-    returns:
-    TemplateResponse: Registration page or redirect if the user is already authenticated
-    """
+    """New user registration page"""
     if current_user:
         return RedirectResponse(url="/")
     return templates.TemplateResponse(
@@ -62,13 +58,7 @@ async def register_form_submit(
     password: str = Form(...),
     db: Session = Depends(get_db),
 ):
-    """
-    Processing the new user registration form.
-
-    returns:
-    RedirectResponse: Redirect to the login page on success
-    TemplateResponse: Registration page with an error on failure
-    """
+    """Processing the new user registration form."""
     try:
         user_data = UserCreateData(email=email, password=password, username=username)
         user = UserService.create_user(db, user_data)
@@ -104,6 +94,7 @@ async def user_profile(
     request: Request,
     current_user: User = Depends(get_template_user),
 ):
+    """User profile page"""
     return templates.TemplateResponse(
         "profile.html",
         {"request": request, "current_user": current_user},
@@ -112,6 +103,7 @@ async def user_profile(
 
 @router.get("/login", response_class=HTMLResponse)
 async def login_form(request: Request, current_user: User = Depends(get_template_user)):
+    """Login page"""
     return templates.TemplateResponse(
         "login.html",
         {"request": request, "current_user": current_user},
@@ -122,6 +114,7 @@ async def login_form(request: Request, current_user: User = Depends(get_template
 async def login_form_submit(
     request: Request, email: str = Form(...), password: str = Form(...)
 ):
+    """Process user login"""
     try:
         access_token = login_user(email, password)
 
@@ -142,12 +135,7 @@ async def login_form_submit(
 
 @router.get("/logout")
 async def logout_user():
-    """
-    Logging the user out.
-
-    returns:
-    RedirectResponse: Redirect to the main page with the access token removed
-    """
+    """Logging the user out"""
     response = RedirectResponse(url="/", status_code=302)
     response.delete_cookie("access_token")
     return response
@@ -160,6 +148,7 @@ async def update_wishlist(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_template_user),
 ):
+    """Updated user wishlist form"""
     update_user = UserService.update_wishlist(db, current_user.id, wishlist_text)
 
     return templates.TemplateResponse(
@@ -172,6 +161,7 @@ async def get_create_game(
     request: Request,
     current_user: User = Depends(get_template_user),
 ):
+    """Create game form page"""
     return templates.TemplateResponse(
         "create-game.html", {"request": request, "current_user": current_user}
     )
@@ -185,6 +175,7 @@ async def user_games(
     current_user: User = Depends(get_template_user),
     db: Session = Depends(get_db),
 ):
+    """User's games list with filtering"""
     try:
         games = GameService.get_filtered_user_games(
             db, user_id=current_user.id, role=role, game_status=status
@@ -228,6 +219,7 @@ async def create_game_submit(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_template_user),
 ):
+    """Process game creation"""
     try:
         if event_date:
             event_date = datetime.fromisoformat(event_date.replace("Z", "+00:00"))
@@ -282,6 +274,7 @@ async def delete_game(
     current_user: User = Depends(get_template_user),
     db: Session = Depends(get_db),
 ):
+    """Delete game"""
     try:
         GameService.delete_game(db, current_user.id, game_id)
         return RedirectResponse(url="/games", status_code=302)
@@ -300,6 +293,7 @@ async def get_game(
     current_user: User = Depends(get_template_user),
     db: Session = Depends(get_db),
 ):
+    """View game page"""
     try:
         game = GameService.get_game_by_id(db, game_id, current_user.id)
 
@@ -322,6 +316,7 @@ async def get_edit_game(
     current_user: User = Depends(get_template_user),
     db: Session = Depends(get_db),
 ):
+    """Edit game form"""
     game = GameService.get_game_by_id(db, game_id, current_user.id)
 
     return templates.TemplateResponse(
@@ -343,6 +338,7 @@ async def post_edit_game(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_template_user),
 ):
+    """Process for edit game"""
     try:
         if event_date:
             event_date = datetime.fromisoformat(event_date.replace("Z", "+00:00"))
@@ -381,7 +377,7 @@ async def join_game_submit(
     current_user: User = Depends(get_template_user),
     db: Session = Depends(get_db),
 ):
-    """Обработка присоединения к игре"""
+    """Processing game joins"""
     try:
         result = GameService.join_the_game(db, current_user.id, secret_key)
 
@@ -404,6 +400,7 @@ async def view_requests(
     current_user: User = Depends(get_template_user),
     db: Session = Depends(get_db),
 ):
+    """View request page"""
     try:
         sent_requests = JoinRequestService.get_user_join_requests(db, current_user.id)
 
@@ -441,6 +438,7 @@ async def approve_request(
     current_user: User = Depends(get_template_user),
     db: Session = Depends(get_db),
 ):
+    """Approve join request"""
     try:
         JoinRequestService.approve_join_request(db, request_id, current_user.id)
         return RedirectResponse(url="/requests", status_code=302)
@@ -459,6 +457,7 @@ async def reject_request(
     current_user: User = Depends(get_template_user),
     db: Session = Depends(get_db),
 ):
+    """Reject join request"""
     try:
         JoinRequestService.reject_join_request(db, request_id, current_user.id)
         return RedirectResponse(url="/requests", status_code=302)
@@ -477,6 +476,7 @@ async def start_draw(
     current_user: User = Depends(get_template_user),
     db: Session = Depends(get_db),
 ):
+    """Start gift draw for game"""
     try:
         DrawService.start_draw(db, current_user.id, game_id)
 
@@ -496,6 +496,7 @@ async def view_gifts(
     current_user: User = Depends(get_template_user),
     db: Session = Depends(get_db),
 ):
+    """View gifts page"""
     try:
         games_data = GiftService.get_user_gifts_overview(db, current_user.id)
 
@@ -527,6 +528,7 @@ async def create_gift_form(
     current_user: User = Depends(get_template_user),
     db: Session = Depends(get_db),
 ):
+    """create gift page"""
     try:
         game = GameService.get_game_by_id(db, game_id, current_user.id)
         participant = next(
@@ -568,6 +570,7 @@ async def create_gift_submit(
     current_user: User = Depends(get_template_user),
     db: Session = Depends(get_db),
 ):
+    """Process create gift"""
     try:
         game = GameService.get_game_by_id(db, game_id, current_user.id)
         participant = next(
@@ -613,6 +616,7 @@ async def update_gift_status(
     current_user: User = Depends(get_template_user),
     db: Session = Depends(get_db),
 ):
+    """Process updating gift status"""
     try:
         participant = ParticipantService.get_participant_by_user_id(db, current_user.id)
         GiftService.update_gift_status(db, gift_id, participant.id, new_status)
@@ -633,6 +637,7 @@ async def get_edit_gift(
     current_user: User = Depends(get_template_user),
     db: Session = Depends(get_db),
 ):
+    """Edit gift page"""
     gift = GiftService.get_gift_by_id(db, gift_id)
     game = GameService.get_game_by_id(db, gift.game_id, current_user.id)
     participant = next(
@@ -668,6 +673,7 @@ async def update_gift_submit(
     current_user: User = Depends(get_template_user),
     db: Session = Depends(get_db),
 ):
+    """Process updating gift data"""
     try:
         if price == "":
             price = None
@@ -695,6 +701,7 @@ async def delete_gift(
     current_user: User = Depends(get_template_user),
     db: Session = Depends(get_db),
 ):
+    """Delete gift"""
     try:
         GiftService.delete_gift(db, gift_id)
         return RedirectResponse(url="/gifts", status_code=302)
@@ -712,6 +719,7 @@ async def get_edit_user(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_template_user),
 ):
+    """Edit user data page"""
     return templates.TemplateResponse(
         "edit-profile.html", {"request": request, "current_user": current_user}
     )
@@ -725,6 +733,7 @@ async def edit_user_data_submit(
     username: str = Form(...),
     email: str = Form(...),
 ):
+    """Process updating user data"""
     try:
         new_user_data = UserUpdateData(username, email)
         UserService.update_user_data(db, current_user.id, new_user_data)
@@ -743,6 +752,7 @@ async def delete_user(
     current_user: User = Depends(get_template_user),
     db: Session = Depends(get_db),
 ):
+    """Process delete user"""
     try:
         UserService.delete_user(db, user_id)
         response = RedirectResponse(url="/", status_code=302)

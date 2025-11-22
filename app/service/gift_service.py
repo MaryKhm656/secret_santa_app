@@ -1,5 +1,5 @@
 from datetime import datetime, timezone
-from typing import List, Optional
+from typing import Optional
 
 from sqlalchemy.orm import Session
 
@@ -13,6 +13,7 @@ from app.service.game_service import GameService
 class GiftService:
     @staticmethod
     def create_gift(db: Session, gift_create_data: GiftCreateData) -> Gift:
+        """Creating gift"""
         gift = Gift(
             participant_id=gift_create_data.participant_id,
             receiver_participant_id=gift_create_data.receiver_participant_id,
@@ -33,6 +34,7 @@ class GiftService:
     def update_gift_data(
         db: Session, new_gift_data: GiftUpdateData, gift_id: int
     ) -> Gift:
+        """Updating gift data"""
         gift = db.query(Gift).filter(Gift.id == gift_id).first_not_deleted()
 
         if new_gift_data.title != gift.title:
@@ -55,6 +57,7 @@ class GiftService:
     def update_gift_status(
         db: Session, gift_id: int, participant_id: int, new_status: str
     ) -> Gift:
+        """Updating gift status"""
         gift = (
             db.query(Gift)
             .filter(Gift.id == gift_id, Gift.participant_id == participant_id)
@@ -80,45 +83,10 @@ class GiftService:
         return gift
 
     @staticmethod
-    def get_santa_gifts(db: Session, participant_id: int) -> List[Gift]:
-        """Получить подарки, которые пользователь дарит (как Санта)"""
-        return (
-            db.query(Gift)
-            .filter(Gift.participant_id == participant_id, Gift.is_deleted == False)
-            .order_by(Gift.created_at.desc())
-            .all()
-        )
-
-    @staticmethod
-    def get_receiver_gifts(db: Session, receiver_participant_id: int) -> List[Gift]:
-        """Получить подарки, которые пользователь получает"""
-        return (
-            db.query(Gift)
-            .filter(
-                Gift.receiver_participant_id == receiver_participant_id,
-                Gift.is_deleted == False,
-            )
-            .order_by(Gift.created_at.desc())
-            .all()
-        )
-
-    @staticmethod
-    def get_gift_for_receiver(
-        db: Session, receiver_participant_id: int
-    ) -> Optional[Gift]:
-        """Получить подарок для получателя (если Санта уже создал)"""
-        return (
-            db.query(Gift)
-            .filter(
-                Gift.receiver_participant_id == receiver_participant_id,
-            )
-            .first_not_deleted()
-        )
-
-    @staticmethod
     def get_gifts_for_user_in_game(
         db: Session, user_id: int, game: Game
     ) -> Optional[GameGiftView]:
+        """Getting user gifts for game"""
         participation = (
             db.query(Participant)
             .filter(
@@ -156,6 +124,7 @@ class GiftService:
 
     @staticmethod
     def get_user_gifts_overview(db: Session, user_id: int) -> list[GameGiftView]:
+        """Getting user gifts overview"""
         games = GameService.get_filtered_user_games(
             db=db, user_id=user_id, role="all", game_status="all"
         )
@@ -170,10 +139,12 @@ class GiftService:
 
     @staticmethod
     def get_gift_by_id(db: Session, gift_id: int) -> Gift:
+        """Getting gift by id"""
         return db.query(Gift).filter(Gift.id == gift_id).first_not_deleted()
 
     @staticmethod
     def delete_gift(db: Session, gift_id: int) -> Optional[str]:
+        """Delete game by soft delete"""
         gift = db.query(Gift).filter(Gift.id == gift_id).first_not_deleted()
         gift.soft_delete()
         db.commit()

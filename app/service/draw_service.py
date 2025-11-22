@@ -4,14 +4,7 @@ from typing import List, Tuple
 from sqlalchemy.orm import Session
 
 from app.constants import NotificationsData
-from app.db.models import (
-    Draw,
-    DrawAssignment,
-    Game,
-    NotificationReceiver,
-    Participant,
-    User,
-)
+from app.db.models import Draw, DrawAssignment, Game, Participant, User
 from app.service.notification_service import NotificationService
 
 
@@ -20,6 +13,7 @@ class DrawService:
     def _generate_assignments(
         participants: List[Participant],
     ) -> List[Tuple[Participant, Participant]]:
+        """Generate random gift assignments ensuring no self or reciprocal pairs"""
         for _ in range(100):
             receivers = participants.copy()
             random.shuffle(receivers)
@@ -45,14 +39,7 @@ class DrawService:
 
     @staticmethod
     def start_draw(db: Session, organizer_id: int, game_id: int) -> Draw:
-        """
-        Запускает жеребьевку для конкретной игры с проверкой на организатора
-
-        :param db:
-        :param organizer_id:
-        :param game_id:
-        :return Draw:
-        """
+        """Start gift draw for a game"""
         organizer = db.get(User, organizer_id)
         if not organizer:
             raise ValueError("Пользователь не найден")

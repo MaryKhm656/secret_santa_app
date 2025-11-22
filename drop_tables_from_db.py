@@ -5,7 +5,6 @@ from app.db.models import (  # noqa: F401
     Game,
     Gift,
     JoinRequest,
-    Message,
     Notification,
     Participant,
     User,

@@ -27,6 +27,7 @@ def verify_password(expected_password: str, hashed_password: str) -> bool:
 
 
 def generate_secret_key_for_game(db: Session) -> str:
+    """Generate unique secret key for game"""
     while True:
         characters = ascii_lowercase + ascii_uppercase + digits
         key = "".join(secrets.choice(characters) for _ in range(10))

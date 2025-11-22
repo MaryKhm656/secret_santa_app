@@ -1,13 +1,3 @@
-.form-group {
-    margin-bottom: 1.5rem;
-}
-
-.form-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1.5rem;
-}
-
 .form-group label {
     display: block;
     margin-bottom: 0.5rem;
@@ -104,12 +94,4 @@
 
 .toggle-text {
     font-weight: 500;
-}
-
-.form-actions {
-    display: flex;
-    gap: 1.5rem;
-    justify-content: center;
-    margin-top: 2rem;
-    flex-wrap: wrap;
 }

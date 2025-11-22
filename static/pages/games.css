@@ -6,12 +6,6 @@
     gap: 2rem;
 }
 
-.games-btn-header {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-}
-
 .filters-section {
     margin-bottom: 2rem;
 }
@@ -87,11 +81,6 @@
     flex-wrap: wrap;
 }
 
-.games-list {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-}
 
 .game-card {
     background: var(--glass-bg);
@@ -215,11 +204,4 @@
     color: rgba(255, 255, 255, 0.8);
     margin-bottom: 2rem;
     font-size: 1.1rem;
-}
-
-.game-actions {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    flex-wrap: wrap;
 }

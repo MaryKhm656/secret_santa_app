@@ -26,7 +26,7 @@ class SoftDeleteMixin:
     deleted_at = Column(DateTime)
 
     def soft_delete(self) -> None:
-        """Помечает запись в БД как удаленную"""
+        """Marks a record in the database as deleted"""
         if self.is_deleted:
             return
 
@@ -56,11 +56,7 @@ class SoftDeleteMixin:
 
 
 class User(Base, SoftDeleteMixin):
-    """Пользователь системы.
-
-    Создаётся при регистрации. Используется как организатор, участник или админ.
-    Для удаления рекомендуется использовать soft-delete (is_active=False).
-    """
+    """System user - can be organizer or participant"""
 
     __tablename__ = "users"
 
@@ -85,22 +81,11 @@ class User(Base, SoftDeleteMixin):
         cascade="all, delete-orphan",
         passive_deletes=True,
     )
-    messages_sent = relationship(
-        "Message", back_populates="sender_user", foreign_keys="Message.sender_user_id"
-    )
-    messages_received = relationship(
-        "Message",
-        back_populates="receiver_user",
-        foreign_keys="Message.receiver_user_id",
-    )
     notifications_receiver = relationship("NotificationReceiver", back_populates="user")
 
 
 class Game(Base, SoftDeleteMixin):
-    """Игра (сессия Тайного Санты).
-
-    Рекомендуется soft-delete/архивация вместо физического удаления для сохранения истории
-    """
+    """Secret Santa game session"""
 
     __tablename__ = "games"
 
@@ -137,6 +122,8 @@ class Game(Base, SoftDeleteMixin):
 
 
 class JoinRequest(Base, SoftDeleteMixin):
+    """User request to join a game"""
+
     __tablename__ = "join_requests"
 
     id = Column(Integer, primary_key=True)
@@ -159,11 +146,7 @@ class JoinRequest(Base, SoftDeleteMixin):
 
 
 class Participant(Base, SoftDeleteMixin):
-    """Участник конкретной игры (association User <-> Game).
-
-    Хранит статус участия и ссылку на того, кому участник дарит подарок
-    (assigned_to_id — participant.id).
-    """
+    """User participation in a specific game"""
 
     __tablename__ = "participants"
     __table_args__ = (
@@ -205,7 +188,7 @@ class Participant(Base, SoftDeleteMixin):
 
 
 class Draw(Base):
-    """Запуск жеребьёвки (версия/сборка результатов)."""
+    """Draw execution instance with results"""
 
     __tablename__ = "draws"
 
@@ -229,7 +212,7 @@ class Draw(Base):
 
 
 class DrawAssignment(Base):
-    """Результат жеребьёвки: participant_from дарит participant_to в рамках Draw."""
+    """Draw result: who gives gift to whom"""
 
     __tablename__ = "draw_assignments"
 
@@ -250,7 +233,7 @@ class DrawAssignment(Base):
 
 
 class Gift(Base, SoftDeleteMixin):
-    """Подарок в рамках игры."""
+    """Gift within a game"""
 
     __tablename__ = "gifts"
 
@@ -283,42 +266,8 @@ class Gift(Base, SoftDeleteMixin):
     game = relationship("Game", back_populates="gifts")
 
 
-class Message(Base, SoftDeleteMixin):
-    """Сообщение между участниками (анонимное или нет)."""
-
-    __tablename__ = "messages"
-
-    id = Column(Integer, primary_key=True)
-    sender_user_id = Column(
-        Integer, ForeignKey("users.id", ondelete="SET NULL"), nullable=True
-    )
-    receiver_user_id = Column(
-        Integer, ForeignKey("users.id", ondelete="SET NULL"), nullable=True
-    )
-    sender_participant_id = Column(
-        Integer, ForeignKey("participants.id", ondelete="SET NULL"), nullable=True
-    )
-    receiver_participant_id = Column(
-        Integer, ForeignKey("participants.id", ondelete="SET NULL"), nullable=True
-    )
-
-    game_id = Column(Integer, ForeignKey("games.id", ondelete="CASCADE"), nullable=True)
-
-    text = Column(Text, nullable=False)
-    is_anonymous = Column(Boolean, default=True)
-    created_at = Column(DateTime, default=now)
-    is_deleted = Column(Boolean, default=False)
-
-    sender_user = relationship(
-        "User", foreign_keys=[sender_user_id], back_populates="messages_sent"
-    )
-    receiver_user = relationship(
-        "User", foreign_keys=[receiver_user_id], back_populates="messages_received"
-    )
-
-
 class Notification(Base):
-    """Уведомление (сам факт события)"""
+    """Notification event"""
 
     __tablename__ = "notifications"
 
@@ -333,10 +282,7 @@ class Notification(Base):
 
 
 class NotificationReceiver(Base):
-    """
-    Получатель конкретного уведомления.
-    Позволяет отправлять одно уведомление нескольким пользователям
-    """
+    """Notification recipient linking user to notification"""
 
     __tablename__ = "notification_receiver"
 

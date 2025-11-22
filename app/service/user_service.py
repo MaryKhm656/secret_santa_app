@@ -41,6 +41,7 @@ class UserService:
     def update_user_data(
         db: Session, user_id: int, new_user_data: UserUpdateData
     ) -> User:
+        """Update user data"""
         user = db.query(User).filter(User.id == user_id).first_not_deleted()
         if not user:
             raise ValueError("Пользователь не найден")
@@ -60,6 +61,7 @@ class UserService:
 
     @staticmethod
     def update_wishlist(db: Session, user_id: int, wishlist_text: str) -> User:
+        """Update user wishlist"""
         user = db.query(User).filter(User.id == user_id).first_not_deleted()
         if not user:
             raise ValueError("Пользователь не найден")
@@ -73,6 +75,7 @@ class UserService:
 
     @staticmethod
     def delete_user(db: Session, user_id: int) -> Optional[str]:
+        """Delete user by soft delete"""
         user = db.get(User, user_id)
         if not user:
             raise ValueError("Пользователь не найден")

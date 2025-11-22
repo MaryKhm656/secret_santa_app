@@ -4,37 +4,12 @@
     padding: 0 2rem;
 }
 
-.game-header-section {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 3rem;
-    gap: 2rem;
-    flex-wrap: wrap;
-}
-
 .game-content-sections {
     display: grid;
     grid-template-columns: 2fr 1fr;
     gap: 2rem;
 }
 
-.game-info-column,
-.game-sidebar {
-    display: flex;
-    flex-direction: column;
-    gap: 2rem;
-}
-
-.info-section,
-.sidebar-section {
-    background: var(--glass-bg);
-    backdrop-filter: blur(15px);
-    border: 1px solid var(--glass-border);
-    border-radius: 20px;
-    padding: 2rem;
-    box-shadow: var(--shadow);
-}
 
 .details-grid {
     display: grid;

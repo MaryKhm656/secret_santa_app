@@ -26,7 +26,6 @@ body {
     overflow-x: hidden;
 }
 
-/* Новогодний снег */
 body::before {
     content: '';
     position: fixed;

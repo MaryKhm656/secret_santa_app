@@ -9,7 +9,7 @@
             <h1>🎮 Мои игры</h1>
             <p>Здесь собраны все твои новогодние приключения!</p>
         </div>
-        <div class="games-btn-header">
+        <div class="content-sections">
             <a href="/create-game" class="btn btn-primary btn-large">
                 ✨ Создать новую игру
             </a>
@@ -161,7 +161,7 @@
                     </div>
                 </div>
                 
-                <div class="game-actions">
+                <div class="form-actions">
                     <a href="/game/{{ game.id }}" class="btn">Перейти к игре</a>
                     {% if game.organizer_id == current_user.id %}
                     <a href="/edit-game/{{ game.id }}" class="btn">Редактировать</a>
