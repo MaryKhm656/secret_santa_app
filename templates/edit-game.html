@@ -7,16 +7,7 @@
     <div class="game-header">
         <h1>🎅 Редактирование игры</h1>
     </div>
-
-    {% if error %}
-    <div class="error-message">
-        <span class="error-emoji">⚠️</span>
-        {{ error }}
-    </div>
-    {% endif %}
-
     <form method="POST" action="/edit-game/{{ game.id }}" class="content-sections" id="gameForm">
-
         <div class="content-section">
             <h2>📝 Основная информация</h2>
 
@@ -94,7 +85,6 @@
 
 {% block scripts %}
 <script>
-// Ползунок приватной игры
 document.addEventListener('DOMContentLoaded', function() {
     const privacyCheckbox = document.getElementById('is_private');
     const privacyHint = document.getElementById('privacy-hint');
@@ -108,20 +98,12 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-// Счетчик символов для описания
 document.getElementById('description').addEventListener('input', function() {
     document.getElementById('descChars').textContent = this.value.length;
 });
 
-// Установка минимальной даты (завтра)
 const tomorrow = new Date();
 tomorrow.setDate(tomorrow.getDate() + 1);
 document.getElementById('event_date').min = tomorrow.toISOString().slice(0, 16);
-
-
-// Редирект на страницу игр
-function redirectToGames() {
-    window.location.href = '/games';
-}
 </script>
 {% endblock %}

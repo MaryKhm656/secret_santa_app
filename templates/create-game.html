@@ -8,14 +8,6 @@
         <h1>🎅 Создать Новую Игру</h1>
         <p>Организуй волшебство для своих друзей!</p>
     </div>
-
-    {% if error %}
-    <div class="error-message">
-        <span class="error-emoji">⚠️</span>
-        {{ error }}
-    </div>
-    {% endif %}
-
     <form method="POST" action="/create-game" class="content-sections" id="gameForm">
         <div class="content-section">
             <h2>📝 Основная информация</h2>
@@ -125,7 +117,6 @@
 
 {% block scripts %}
 <script>
-// Ползунок приватной игры
 document.addEventListener('DOMContentLoaded', function() {
     const privacyCheckbox = document.getElementById('is_private');
     const privacyHint = document.getElementById('privacy-hint');
@@ -139,17 +130,14 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-// Счетчик символов для описания
 document.getElementById('description').addEventListener('input', function() {
     document.getElementById('descChars').textContent = this.value.length;
 });
 
-// Установка минимальной даты (завтра)
 const tomorrow = new Date();
 tomorrow.setDate(tomorrow.getDate() + 1);
 document.getElementById('event_date').min = tomorrow.toISOString().slice(0, 16);
 
-// Копирование секретного ключа
 function copySecretKey() {
     const keyElement = document.getElementById('generatedKey');
     const keyText = keyElement.textContent;
@@ -163,12 +151,10 @@ function copySecretKey() {
     });
 }
 
-// Редирект на страницу игр
 function redirectToGames() {
     window.location.href = '/games';
 }
 
-// Закрытие модалки
 window.onclick = function(event) {
     const modal = document.getElementById('successModal');
     if (event.target === modal) {
