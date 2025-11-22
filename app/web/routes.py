@@ -13,6 +13,7 @@ from app.db.models import Gift, Participant, User
 from app.dependencies import get_db, get_template_user
 from app.schemas.games import GameCreateData, GameUpdateData
 from app.schemas.gifts import GiftCreateData, GiftUpdateData
+from app.schemas.join_requests import NULL_DATA
 from app.schemas.users import UserCreateData, UserUpdateData
 from app.service.draw_service import DrawService
 from app.service.game_service import GameService
@@ -384,10 +385,10 @@ async def join_game_submit(
     try:
         result = GameService.join_the_game(db, current_user.id, secret_key)
 
-        if hasattr(result, "participant"):
-            message = "🎉 Вы успешно присоединились к игре!"
-        else:
+        if result.join_request and result.join_request is not NULL_DATA:
             message = "📨 Заявка на вступление отправлена организатору!"
+        else:
+            message = "🎉 Вы успешно присоединились к игре!"
 
         return HTMLResponse(content=message, status_code=200)
 

@@ -114,20 +114,20 @@ class GameService:
                 notification=notification,
                 receivers=receivers,
             )
+        else:
+            participant = ParticipantService.create_participant(db, user_id, game.id)
 
-        participant = ParticipantService.create_participant(db, user_id, game.id)
+            notification = NotificationService.create_notification(
+                db=db, game_id=game.id, text=NotificationsData.NEW_PARTICIPANT_IN_GAME
+            )
 
-        notification = NotificationService.create_notification(
-            db=db, game_id=game.id, text=NotificationsData.NEW_PARTICIPANT_IN_GAME
-        )
+            receivers = NotificationService.send_notification_to_users(
+                db=db, user_ids=[game.organizer_id], notification=notification
+            )
 
-        receivers = NotificationService.send_notification_to_users(
-            db=db, user_ids=[game.organizer_id], notification=notification
-        )
-
-        return JoinResult(
-            participant=participant, notification=notification, receivers=receivers
-        )
+            return JoinResult(
+                participant=participant, notification=notification, receivers=receivers
+            )
 
     @staticmethod
     def join_the_game_after_accept_request(
@@ -163,7 +163,7 @@ class GameService:
         if game.organizer_id != organizer_id:
             raise ValueError("Данные действия доступны только организатору игры")
 
-        if new_game_data.title:
+        if new_game_data.title != game.title:
             if len(new_game_data.title.strip()) < 2:
                 raise ValueError("Слишком короткое название игры")
             game.title = new_game_data.title.strip()
@@ -171,21 +171,21 @@ class GameService:
         if new_game_data.is_private is not NOT_PROVIDED:
             game.is_private = new_game_data.is_private
 
-        if new_game_data.description:
+        if new_game_data.description != game.description:
             game.description = new_game_data.description
 
-        if new_game_data.budget:
-            if new_game_data.budget < 0:
+        if new_game_data.budget != game.budget:
+            if new_game_data.budget and new_game_data.budget < 0:
                 raise ValueError("Бюджет игры не может быть отрицательным")
             game.budget = new_game_data.budget
 
-        if new_game_data.event_date:
+        if new_game_data.event_date != game.event_date:
             new_game_data.event_date = GameService._validate_event_date(
                 new_game_data.event_date
             )
             game.event_date = new_game_data.event_date
 
-        if new_game_data.status:
+        if new_game_data.status != game.status:
             if new_game_data.status.lower().strip() not in GameStatus.ALL:
                 raise ValueError("Недопустимый статус игры")
             game.status = new_game_data.status.lower().strip()
