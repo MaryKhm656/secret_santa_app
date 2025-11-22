@@ -128,9 +128,15 @@ class Game(Base, SoftDeleteMixin):
     )
     draws = relationship("Draw", back_populates="game", cascade="all, delete-orphan")
     gifts = relationship("Gift", back_populates="game", cascade="all, delete-orphan")
+    join_requests = relationship(
+        "JoinRequest",
+        back_populates="game",
+        cascade="all, delete-orphan",
+        passive_deletes=True,
+    )
 
 
-class JoinRequest(Base):
+class JoinRequest(Base, SoftDeleteMixin):
     __tablename__ = "join_requests"
 
     id = Column(Integer, primary_key=True)
@@ -145,9 +151,11 @@ class JoinRequest(Base):
     organizer_id = Column(
         Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False
     )
+    is_deleted = Column(Boolean, default=False)
+    deleted_at = Column(DateTime)
 
     user = relationship("User", foreign_keys=[user_id])
-    game = relationship("Game", foreign_keys=[game_id])
+    game = relationship("Game", back_populates="join_requests", foreign_keys=[game_id])
 
 
 class Participant(Base, SoftDeleteMixin):

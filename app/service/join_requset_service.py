@@ -42,7 +42,11 @@ class JoinRequestService:
     def update_join_request_status(
         db: Session, new_status: str, join_request_id: int
     ) -> JoinRequest:
-        join_request = db.get(JoinRequest, join_request_id)
+        join_request = (
+            db.query(JoinRequest)
+            .filter(JoinRequest.id == join_request_id)
+            .first_not_deleted()
+        )
         if not join_request:
             raise ValueError("Запрос не найден")
 
@@ -62,6 +66,7 @@ class JoinRequestService:
             db.query(JoinRequest)
             .filter(JoinRequest.user_id == user_id)
             .order_by(JoinRequest.created_at.desc())
+            .not_deleted()
             .all()
         )
 
@@ -76,6 +81,7 @@ class JoinRequestService:
                 JoinRequest.status == JoinRequestStatus.PENDING,
             )
             .order_by(JoinRequest.created_at.desc())
+            .not_deleted()
             .all()
         )
 
@@ -90,7 +96,7 @@ class JoinRequestService:
                 JoinRequest.organizer_id == organizer_id,
                 JoinRequest.status == JoinRequestStatus.PENDING,
             )
-            .first()
+            .first_not_deleted()
         )
 
         if not join_request:
@@ -130,7 +136,7 @@ class JoinRequestService:
                 JoinRequest.organizer_id == organizer_id,
                 JoinRequest.status == JoinRequestStatus.PENDING,
             )
-            .first()
+            .first_not_deleted()
         )
 
         if not join_request:

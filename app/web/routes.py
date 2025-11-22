@@ -416,8 +416,10 @@ async def view_requests(
             {
                 "request": request,
                 "current_user": current_user,
-                "sent_requests": sent_requests,
-                "pending_requests": pending_requests,
+                "sent_requests": sent_requests if sent_requests is not None else [],
+                "pending_requests": pending_requests
+                if pending_requests is not None
+                else [],
             },
         )
     except Exception as e:
