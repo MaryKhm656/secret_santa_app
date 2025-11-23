@@ -80,6 +80,11 @@ class GameService:
         if not game:
             raise ValueError("Игра по такому секретному ключу не найдена")
 
+        if user_id == game.organizer_id:
+            raise ValueError(
+                "Организатор не может присоединиться к своей игре в качестве участника"
+            )
+
         existing_participant = (
             db.query(Participant).filter_by(user_id=user_id, game_id=game.id).first()
         )

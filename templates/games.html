@@ -283,12 +283,18 @@ document.getElementById('joinForm').addEventListener('submit', async function(e)
             body: formData
         });
 
+        const message = await response.text();
+
         if (response.ok) {
-            const message = await response.text();
             alert(message);
             closeJoinModal();
             setTimeout(() => window.location.reload(), 500);
+        } else {
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+            errorDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
+
     } catch (error) {
         errorDiv.textContent = 'Ошибка сети. Попробуйте еще раз.';
         errorDiv.style.display = 'block';

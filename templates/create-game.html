@@ -134,9 +134,9 @@ document.getElementById('description').addEventListener('input', function() {
     document.getElementById('descChars').textContent = this.value.length;
 });
 
-const tomorrow = new Date();
-tomorrow.setDate(tomorrow.getDate() + 1);
-document.getElementById('event_date').min = tomorrow.toISOString().slice(0, 16);
+const minDate = new Date();
+minDate.setHours(minDate.getHours() + 10);
+document.getElementById('event_date').min = minDate.toISOString().slice(0, 16);
 
 function copySecretKey() {
     const keyElement = document.getElementById('generatedKey');

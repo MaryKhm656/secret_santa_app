@@ -83,9 +83,8 @@ document.getElementById('joinForm').addEventListener('submit', async function(e)
             closeJoinModal();
             setTimeout(() => window.location.reload(), 500);
         } else {
-            errorDiv.textContent = error;
+            errorDiv.textContent = message;
             errorDiv.style.display = 'block';
-
             errorDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
 
