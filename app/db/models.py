@@ -162,9 +162,6 @@ class Participant(Base, SoftDeleteMixin):
     )
 
     assigned_to_id = Column(Integer, ForeignKey("participants.id", ondelete="SET NULL"))
-
-    wishlist = Column(Text)
-    gift_status = Column(String(20), default=GiftStatus.NOT_SENT)
     joined_at = Column(DateTime, default=now)
     left_at = Column(DateTime)
 
